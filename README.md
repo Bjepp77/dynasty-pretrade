@@ -6,7 +6,8 @@ Dynasty (not redraft) fantasy football tool. Pick a player and see which kind of
 - Player search with autocomplete; Enter picks the first suggestion (player search and both trade inputs).
 - League format toggle in the header: 1QB or Superflex, and PPR, half PPR or standard. Changing it refetches FantasyCalc values and recomputes PPG with the matching Sleeper points field. The choice is remembered in localStorage.
 - Draft picks in trade mode, searchable like players (for example "2027 1st").
-- Elite players get the "Core asset (any team)" badge instead of an archetype.
+- Every player and pick gets an **overall score out of 100 for each team type** (Contender, Retooler, Rebuilder), built from aggregate market value plus a statistical model.
+- Elite players (all three scores 85+) get the "Core asset (any team)" badge instead of an archetype.
 
 ## Run
 ```
@@ -14,37 +15,39 @@ cd ~/Code/dynasty-pretrade
 python3 -m http.server 8787
 # open http://localhost:8787
 ```
-No build step, no API keys. Test the scoring in the terminal: `node test.js "Josh Allen" "Derrick Henry"`. Other formats: `QBS=2 PPR=0.5 node test.js`. The test also prints the Core assets, a player-for-pick trade and a fallback-pick build.
+No build step, no API keys. Refresh the data snapshots (Node 18+): `node scripts/fetch-values.mjs` (market values, daily) and `node scripts/fit-stats.mjs` (stats model, about 1 minute, after each season or roster change). Test the scoring in the terminal: `node test.js "Josh Allen" "Derrick Henry"`. Other formats: `QBS=2 PPR=0.5 node test.js`. The test also prints the Core assets, the top 5 per team type and two trades.
 
-## Data (all verified live, client-side fetch)
-- Sleeper players `api.sleeper.app/v1/players/nfl`: team, age, injury, depth chart. Filtered to active QB/RB/WR/TE on a team.
-- FantasyCalc dynasty and redraft values (`numQbs` 1 or 2, 12 teams, `ppr` 1, 0.5 or 0), matched by `sleeperId`. About 400 players have values, so the search covers those.
-- Draft picks: FantasyCalc rows with position `PICK` (as of 2026-10-21: 2027 1st-4th as generic plus Early/Mid/Late, and generic 2028 and 2029 1st-4th; 2026 picks are gone because that draft is done). If the response has no picks, a fallback table in `scoring.js` (`PICK_FALLBACK`, a 1QB PPR snapshot) is used, and the status line says "picks: fallback table".
-- Sleeper stats `stats/nfl/regular/2025` (PPG = pts_ppr, pts_half_ppr or pts_std / gp, matching the scoring setting). Falls back to 2024 if 2025 is empty.
-- Strength of schedule: **demo estimate**, hand-set in `data/sos.js`. It is not live data.
-- Results are cached in localStorage for the day: one slimmed Sleeper entry plus one slimmed values entry per format. Older days' entries are removed on load; storage failures are ignored.
+## Data
+- **Market value** (`data/values.json`, built by `scripts/fetch-values.mjs`): aggregate of FantasyCalc, Dynasty Daddy, DynastyProcess and Sleeper dynasty ADP for six formats (1QB/SF x PPR/half/standard), players and draft picks. KeepTradeCut and FantasyPros are excluded because their terms forbid scraping or republishing. Each source is rank-matched to the FantasyCalc scale, scored `100*(value/top)^0.5`, then combined by a coverage-weighted 20% trimmed mean. Details: `docs/market-model.md`.
+- **Stats model** (`data/stats.json`, built by `scripts/fit-stats.mjs`): per-position ridge regression on nflverse data (usage, share, efficiency, availability, age), trained 2018-2023 and tested on 2024 to 2025. It beats "last season's PPG" at every position (holdout R² QB 0.08 vs -0.17, RB 0.68 vs 0.61, WR 0.68 vs 0.55, TE 0.66 vs 0.53). Age curves and the chance a player is still a regular in 1-3 seasons are fitted from data. `statScoreNow` scores next season's projected PPG, `statScoreLong` the survival-weighted, discounted 3-season projection. Both use `100*Phi(z)` against the position's starter pool, so 50 = an average starter. Details: `docs/stats-model.md`.
+- **Sleeper players** (live in the browser, cached for the day): team, injury status, depth chart.
 
-## Scoring (every number is shown as a bar in the UI)
-Each factor is 0-100.
-- **Age runway**: position curve. RB peak 22-25, cliff 27. WR peak 23-27, decline 29, cliff 31. TE peak 25-29, cliff 31. QB peak 25-32, decline 34, cliff 36. "Years to cliff" = cliff age minus age.
-- **Health**: 60% games played last season (out of 17) plus a base, minus an injury-status penalty (Out/IR/PUP/Doubtful/Questionable).
-- **Production**: PPG percentile within position (needs 4+ games).
-- **Situation**: 40% depth chart order, 30% team passing-offense percentile (sum of dynasty value of the team's QB/WR/TE), 30% target competition (teammates at the same position with higher value).
-- **Schedule**: SOS rank to 0-100 (demo estimate).
-- **Value**: FantasyCalc dynasty value relative to the top player. **Future premium**: (dynasty - redraft) / dynasty.
+## Overall score (0-100 per team type)
+`Overall = m * Market + (1 - m) * Stats`, where `Stats = now * statScoreNow + (1 - now) * statScoreLong`.
 
-WinNow = 0.35 Production + 0.20 Health + 0.20 Situation + 0.10 SOS + 0.10 Value + 0.05 Age.
-LongTerm = 0.35 Age + 0.25 Future premium + 0.25 Value + 0.10 Health + 0.05 Situation.
+| Team type | m (market weight) | now (stats weight on this season) |
+|---|---|---|
+| Contender | 0.40 | 0.80 |
+| Retooler | 0.50 | 0.50 |
+| Rebuilder | 0.60 | 0.15 |
 
-Archetype: WinNow minus LongTerm above 10 = Contender, below -10 = Rebuilder, otherwise Retooler. Tag: within 1.5 years of the cliff and still productive = "Sell before cliff". Both scores 75+ and balanced = "Buy for anyone (core hold)". Both scores 85+ = archetype "Core asset (any team)", whatever the gap (in 1QB PPR on 2026-10-21 that is Gibbs, Bijan Robinson and McBride).
+- A player with no NFL stats (a rookie) uses the market score only and says so.
+- Draft picks have no stats: market score -25 (Contender), -5 (Retooler), +10 (Rebuilder).
+- The Contender score loses points for current injury status: IR 15, Out/PUP 12, Suspended 10, Doubtful 8, Questionable 3.
+- Archetype: Contender minus Rebuilder above 5 = Contender, below -5 = Rebuilder, otherwise Retooler. All three 85+ = Core asset.
+- Tag: under a 50% chance of still being a regular in 2 seasons while the now score is 50+ = "Sell before cliff". Best score under 40 = "Contender depth only" or "Low value".
 
 ## Trade mode
-Each player's dynasty value is scaled by `0.5 + fit/100`, where fit is WinNow (Contender), LongTerm (Rebuilder) or their average (Retooler). A draft pick uses a fixed fit (Contender 25, Retooler 55, Rebuilder 90) because it adds nothing to this season's lineup. Its value is the FantasyCalc pick value. The side with the higher scaled total is "better for" that team type. Raw dynasty totals are shown too.
+Each asset's aggregate market value (FantasyCalc scale) is scaled by `0.5 + overall/100` for each team type. The side with the higher total is "better for" that team type. Raw aggregate totals are shown too.
 
-## Known estimates (not live, not fitted)
-- **Strength of schedule** (`data/sos.js`) is a hand-set demo table. It is not live data and carries 10% of WinNow.
-- **Age curves and cliff ages** (`AGE_CURVE` in `scoring.js`) are hand-set rules of thumb, not fitted to historical data.
-- **Pick fit** (25/55/90) and the **fallback pick table** are hand-set.
+## Known estimates (hand-set, not fitted)
+- The market vs stats weights, the per-type horizon weights, the pick adjustments and the injury penalties above.
+- Market source weights (FantasyCalc 1.0, Dynasty Daddy 1.0, DynastyProcess 0.75, Sleeper ADP 0.6).
+- The old strength-of-schedule demo table is gone; schedule is no longer scored.
 
 ## Known limits
-12-team leagues only. PPG uses last season's stats, so rookies and injured players score low on production. Picks have no per-year discount beyond what FantasyCalc prices in.
+- Market values are a snapshot (date shown in the app), not live. Re-run `scripts/fetch-values.mjs` to refresh.
+- The stats model is PPR only; half and standard formats change the market half only.
+- The QB stats model is weak (R² 0.08 on 35 players). Survival odds past age 36 rest on few players.
+- Old producers priced as contender pieces (e.g. a 33-year-old RB) can land as "Retooler" because the Rebuilder score leans on market value.
+- 12-team leagues only.

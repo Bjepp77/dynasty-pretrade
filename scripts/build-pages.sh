@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 rm -rf dist && mkdir -p dist/data dist/docs
-cp index.html style.css scoring.js sim.js league.js app.js dist/
+cp index.html style.css scoring.js sim.js league.js suggest.js app.js dist/
 cp data/values.json data/stats.json data/sos.json dist/data/
 cp docs/*.md dist/docs/
 touch dist/.nojekyll # serve files as-is

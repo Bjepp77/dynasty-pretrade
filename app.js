@@ -157,7 +157,9 @@ async function loadLeague() {
     $("#lfmt").textContent = note;
     if (changed) { $("#qbs").value = SET.qbs = f.qbs; $("#ppr").value = SET.ppr = f.ppr; try { localStorage.setItem("dpt_settings", JSON.stringify(SET)); } catch (e) {} READY = load(); await READY; }
     st.textContent = `${L.name} ${L.season}, week ${L.week}: ${L.numTeams} teams, ${L.playoffTeams} make the playoffs. Simulated ${LGSIM.n.toLocaleString()} seasons in ${LGSIM.ms} ms.`;
-    renderLeague();
+    if (SHARE && SHARE.league === id && L.teams.some((t) => t.rid === SHARE.me)) { LGME = SHARE.me; $("#lme").value = LGME; }
+    renderLeague(); renderSuggest();
+    if (SHARE && SHARE.league === id) { const s = SHARE; SHARE = null; if (L.teams.some((t) => t.rid === s.them)) { $("#spart").value = s.them; runSuggest(); } }
   } catch (e) { if (tok === LGTOK) st.textContent = "League load failed: " + e.message; }
 }
 
@@ -206,4 +208,53 @@ function leagueTradeOdds(t) {
 }
 $("#lload").onclick = loadLeague;
 $("#lid").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLeague(); });
-$("#lme").onchange = () => { LGME = +$("#lme").value; cset("dpt_league", { id: LG.id, me: LGME }); renderLeague(); if (!$("#trade").hidden) renderTrade(); };
+$("#lme").onchange = () => { LGME = +$("#lme").value; cset("dpt_league", { id: LG.id, me: LGME }); renderLeague(); renderSuggest(); if (!$("#trade").hidden) renderTrade(); };
+
+// ---------- Trade suggester (suggest.js): my team + one partner, top skeletons, CSV and share link ----------
+let SUG = null, SHARE = Suggest.decodeShare(location.hash);
+function renderSuggest() {
+  const box = $("#sug"); if (!LG) { box.innerHTML = ""; return; }
+  const opts = LG.teams.filter((t) => t.rid !== LGME).map((t) => `<option value="${t.rid}">${esc(t.owner)} (${esc(t.team)})</option>`).join("");
+  box.innerHTML = `<div class="card"><h3>Trade suggester</h3>
+   <div class="lrow"><select id="spart" aria-label="Trade partner">${opts}</select><button id="sgo">Find trades</button></div>
+   <p class="meta">Searches both rosters (players and picks, 1-for-1 up to 3-for-2) for trades near market-fair where each side gains by its own lens. Skeletons to negotiate from, not trades to accept.</p><div id="sres"></div></div>`;
+  $("#sgo").onclick = runSuggest; SUG = null;
+}
+function runSuggest() {
+  const them = +$("#spart").value, me = LGME, res = $("#sres"); if (!LG || !them) return;
+  res.innerHTML = "<p class='meta'>Searching and simulating title odds...</p>";
+  setTimeout(() => {
+    if (!LG || LGME !== me) return;
+    SUG = Object.assign(Suggest.suggest(DB, LG, me, them), { league: LG.id });
+    try { history.replaceState(null, "", "#" + Suggest.encodeShare({ league: LG.id, me, them })); } catch (e) {}
+    renderSuggestResults();
+  }, 20);
+}
+function sugMeta() {
+  return { sources: DB.sources.filter((x) => x.ok).map((x) => x.name).join(", "), snapshot: DB.generated.slice(0, 10), league: LG.name, note: "Skeleton to negotiate from, not a recommendation to accept." };
+}
+function renderSuggestResults() {
+  const r = SUG, L = LG, nm = (rid) => esc(L.teams.find((t) => t.rid === rid).owner), m = sugMeta();
+  const pts = (x) => (x >= 0 ? "+" : "") + x.toFixed(1), pc = (x) => (x >= 0 ? "+" : "") + (100 * x).toFixed(0) + "%";
+  const li = (a) => `<li><span>${esc(a.name)} <small>${a.isPick ? "pick" : a.pos} · value ${Math.round(a.value)}</small>${a.lowConf ? ' <small class="lowconf">low-confidence stats</small>' : ""}</span></li>`;
+  const side = (who, x) => `<div><small>${who} (${x.type})</small><b>${pc(x.lensGain)}</b><small>lens value · title ${P1(x.titleBefore)} to ${P1(x.titleAfter)} (${pts(x.dTitle)} pts)${Math.abs(x.dPPG) >= 0.1 ? " · lineup " + pts(x.dPPG) + " PPG" : ""}</small></div>`;
+  const cards = r.suggestions.map((s, i) => `<div class="card sk"><h4>Skeleton ${i + 1} <span class="tag">${s.market.band}, ${(100 * s.market.pct).toFixed(1)}% market gap</span>${s.lowConf ? ' <span class="tag lowconf" title="A low-confidence stats position, or a title-odds move inside simulation noise.">Low confidence</span>' : ""}</h4>
+    <div class="pair"><div><small>You give · market ${Math.round(s.market.give).toLocaleString()}</small><ul>${s.give.map(li).join("")}</ul></div><div><small>You get · market ${Math.round(s.market.get).toLocaleString()}</small><ul>${s.get.map(li).join("")}</ul></div></div>
+    <div class="verdict">${side("You", s.me)}${side(nm(s.them.rid), s.them)}</div><p class="exp">${esc(s.why)}</p><button data-open="${i}">Open in Trade tab</button></div>`).join("");
+  $("#sres").innerHTML = `<p class="meta">You: ${r.type[r.me]}. ${nm(r.them)}: ${r.type[r.them]} (from baseline title and playoff odds). Searched ${r.searched.toLocaleString()} combinations, ${r.fair.toLocaleString()} near market-fair, simulated ${r.simulated} at ${r.n.toLocaleString()} seasons each (${r.ms} ms).</p>
+   ${r.suggestions.length ? cards : "<p class='meta'>No skeleton where both sides gain. Try another partner.</p>"}
+   <div class="lrow"><button id="scsv"${r.suggestions.length ? "" : " disabled"}>Download CSV</button><button id="slink">Copy share link</button><span id="smsg" class="meta"></span></div>
+   <p class="meta">Skeletons to negotiate from, not trades to accept. Market values: ${esc(m.sources)}, snapshot ${m.snapshot}. Lens value = market value weighted by each team type's overall score, package-discounted. Title odds: ${r.n.toLocaleString()}-season Monte Carlo, moves under ${Suggest.NOISE} pts are noise. Picks are valued at an estimated slot from the original owner's power rank and do not change lineups.</p>`;
+  $("#sres").querySelectorAll("[data-open]").forEach((b) => (b.onclick = () => { const s = r.suggestions[+b.dataset.open]; sideA = s.give.map((a) => a.id); sideB = s.get.map((a) => a.id); showTab("Trade"); }));
+  const say = (t) => ($("#smsg").textContent = t);
+  $("#scsv").onclick = () => {
+    const url = URL.createObjectURL(new Blob([Suggest.toCSV(r, m)], { type: "text/csv" })), a = document.createElement("a");
+    a.href = url; a.download = `trade-skeletons-${r.me}-${r.them}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); say("CSV downloaded.");
+  };
+  $("#slink").onclick = () => {
+    const link = location.href.split("#")[0] + "#" + Suggest.encodeShare({ league: r.league, me: r.me, them: r.them });
+    (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => say("Link copied."), () => say(link));
+  };
+}
+// Share link: #sug=1&league=..&me=..&with=.. opens the League tab, loads the league and reruns the search.
+if (SHARE) { $("#lid").value = SHARE.league; showTab("League"); loadLeague(); }

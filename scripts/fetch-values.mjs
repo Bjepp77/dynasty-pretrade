@@ -13,6 +13,7 @@ const UA = "dynasty-pretrade/0.1 (personal hobby project; one fetch per source p
 const SEASON = new Date().getFullYear();
 const GH_RAW = "https://raw.githubusercontent.com/dynastyprocess/data/master/files/";
 const MIN_PLAYERS = 300; // per format; a healthy run yields 500+
+const MIN_PICKS = 20; // per format; trade mode has no other pick source (a healthy run yields 53)
 const MIN_SOURCES = 3; // of 4 (fc and dd are also individually required)
 const SKILL = new Set(["QB", "RB", "WR", "TE"]);
 
@@ -319,7 +320,8 @@ async function main() {
   if (srcData.fc && srcData.fc.note) problems.push(`fantasycalc partial: ${srcData.fc.note}`);
   const okCount = Object.keys(srcData).length;
   if (okCount < MIN_SOURCES) problems.push(`only ${okCount} of ${adapters.length} sources returned data (need ${MIN_SOURCES})`);
-  for (const [k, v] of Object.entries(formats)) { const n = Object.keys(v).length; if (n < MIN_PLAYERS) problems.push(`format ${k} has ${n} entries (need ${MIN_PLAYERS})`); }
+  for (const [k, v] of Object.entries(formats)) { const n = Object.keys(v).length; if (n < MIN_PLAYERS) problems.push(`format ${k} has ${n} entries (need ${MIN_PLAYERS})`);
+    const np = Object.values(v).filter((e) => e.pos === "PICK").length; if (np < MIN_PICKS) problems.push(`format ${k} has ${np} draft picks (need ${MIN_PICKS})`); }
   if (problems.length) { console.error("REFUSING to write values.json (old file kept):\n - " + problems.join("\n - ")); process.exit(1); }
   await mkdir(dirname(OUT), { recursive: true });
   const tmp = OUT + ".tmp";

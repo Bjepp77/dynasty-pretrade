@@ -1,6 +1,6 @@
 {
  "meta": {
-  "generated": "2026-10-21T22:29:04.329Z",
+  "generated": "2026-10-21T22:50:40.988Z",
   "featureSeason": 2025,
   "projects": [
    2026,
@@ -15,39 +15,39 @@
    "QB": {
     "h1": {
      "trainRows": 201,
-     "lambda": 30,
+     "lambda": 100,
      "holdout": {
       "featureYear": 2024,
       "targetYear": 2025,
       "n": 35,
-      "r2": 0.078,
-      "mae": 3.18,
+      "r2": 0.145,
+      "mae": 3.05,
       "baselineR2": -0.168,
       "baselineMae": 3.8
      }
     },
     "h2": {
      "trainRows": 199,
-     "lambda": 30,
+     "lambda": 100,
      "holdout": {
       "featureYear": 2023,
       "targetYear": 2025,
       "n": 44,
-      "r2": 0.382,
-      "mae": 2.72,
+      "r2": 0.44,
+      "mae": 2.53,
       "baselineR2": -0.349,
       "baselineMae": 4.21
      }
     },
     "h3": {
      "trainRows": 165,
-     "lambda": 10,
+     "lambda": 30,
      "holdout": {
       "featureYear": 2022,
       "targetYear": 2025,
       "n": 47,
-      "r2": 0.308,
-      "mae": 2.68,
+      "r2": 0.32,
+      "mae": 2.6,
       "baselineR2": -0.611,
       "baselineMae": 4.51
      }
@@ -177,6 +177,13 @@
     }
    }
   },
+  "confidence": {
+   "QB": "low",
+   "RB": "ok",
+   "WR": "ok",
+   "TE": "ok"
+  },
+  "lowConfidenceR2": 0.25,
   "cliffModel": {
    "priorStrengthK": 50,
    "rollingLogLoss": {
@@ -264,78 +271,78 @@
    "ageDefinition": "age on Sep 1 of the season being used as the feature season",
    "effectPPG": {
     "h1": [
-     0.62,
-     0.54,
-     0.45,
-     0.32,
-     0.18,
-     0.05,
-     -0.1,
-     -0.24,
-     -0.36,
-     -0.48,
-     -0.6,
-     -0.72,
-     -0.63
+     0.5,
+     0.42,
+     0.34,
+     0.23,
+     0.11,
+     -0.01,
+     -0.12,
+     -0.23,
+     -0.3,
+     -0.37,
+     -0.44,
+     -0.51,
+     -0.4
     ],
     "h2": [
-     0.96,
-     0.83,
-     0.7,
-     0.51,
-     0.33,
-     0.15,
-     0,
-     -0.14,
+     0.72,
+     0.64,
+     0.57,
+     0.45,
+     0.32,
+     0.2,
+     0.08,
+     -0.04,
+     -0.17,
      -0.3,
-     -0.46,
-     -0.75,
-     -1.03,
-     -1.03
+     -0.48,
+     -0.65,
+     -0.8
     ],
     "h3": [
-     1.42,
      1.21,
-     0.99,
-     0.74,
-     0.5,
-     0.25,
-     0.03,
-     -0.2,
-     -0.31,
-     -0.43,
-     -1.05,
-     -1.68,
-     -1.4
+     1.07,
+     0.93,
+     0.73,
+     0.53,
+     0.33,
+     0.12,
+     -0.08,
+     -0.27,
+     -0.46,
+     -0.86,
+     -1.26,
+     -1.44
     ]
    },
    "yearlyDeltaPPG": [
     -0.08,
-    -0.09,
-    -0.13,
-    -0.14,
-    -0.13,
-    -0.15,
-    -0.14,
+    -0.08,
+    -0.11,
     -0.12,
     -0.12,
-    -0.12,
-    -0.12,
-    0.09
+    -0.11,
+    -0.11,
+    -0.07,
+    -0.07,
+    -0.07,
+    -0.07,
+    0.11
    ],
    "yearlyDeltaPct": [
     -0.5,
-    -0.6,
-    -0.9,
-    -0.9,
-    -0.9,
-    -1,
-    -0.9,
+    -0.5,
+    -0.7,
     -0.8,
     -0.8,
-    -0.8,
-    -0.8,
-    0.6
+    -0.7,
+    -0.7,
+    -0.5,
+    -0.5,
+    -0.5,
+    -0.5,
+    0.7
    ],
    "refPPG": 15.23,
    "hingeKnots": [
@@ -1523,9 +1530,9 @@
    "name": "Joe Flacco",
    "pos": "QB",
    "age": 41.8,
-   "projPPG1": 12.66,
-   "projPPG3": 10.97,
-   "projPPG2": 11.97,
+   "projPPG1": 13.06,
+   "projPPG3": 11.48,
+   "projPPG2": 12.27,
    "survival": [
     0.69,
     0.477,
@@ -1538,26 +1545,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    12.97,
-    14.7,
-    15.32
+    13.58,
+    14.81,
+    15.3
    ],
    "expPPG": [
-    10.97,
-    10.86,
-    10.18
+    11.48,
+    10.94,
+    10.17
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.68,
-    "usage": -0.56,
-    "efficiency": -0.64,
-    "availability": -0.05,
-    "age": -0.63,
+    "recentProduction": -0.53,
+    "usage": -0.97,
+    "teamContext": 0.57,
+    "efficiency": -0.77,
+    "availability": -0.06,
+    "age": -0.4,
     "metrics": {
      "ppg": 11.282,
      "att_pg": 32,
+     "db_pg": 33.385,
      "rush_ppg": 0.731,
+     "car_pg": 1.615,
+     "rush_share": 0.072,
+     "team_att_pg": 37.647,
+     "team_epa_pp": 0.019,
+     "team_tds_pg": 2.765,
      "epa_db": -0.094,
      "cpoe": -2.824,
      "ypa": 5.959,
@@ -1566,7 +1580,7 @@
     },
     "gamesLastSeason": 13
    },
-   "longPPG": 22.71,
+   "longPPG": 23.16,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -1574,9 +1588,9 @@
    "name": "Aaron Rodgers",
    "pos": "QB",
    "age": 42.9,
-   "projPPG1": 14.93,
-   "projPPG3": 12.4,
-   "projPPG2": 13.54,
+   "projPPG1": 14.3,
+   "projPPG3": 11.97,
+   "projPPG2": 12.89,
    "survival": [
     0.69,
     0.477,
@@ -1589,26 +1603,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    15.09,
-    15.48,
-    15.77
+    14.55,
+    14.75,
+    15.31
    ],
    "expPPG": [
-    12.76,
-    11.43,
-    10.48
+    12.3,
+    10.89,
+    10.18
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.15,
-    "usage": -0.54,
-    "efficiency": -0.01,
-    "availability": 1.02,
-    "age": -0.63,
+    "recentProduction": -0.1,
+    "usage": -1.12,
+    "teamContext": -0.19,
+    "efficiency": -0.08,
+    "availability": 0.97,
+    "age": -0.4,
     "metrics": {
      "ppg": 14.193,
      "att_pg": 31.125,
+     "db_pg": 32.938,
      "rush_ppg": 0.756,
+     "car_pg": 1.313,
+     "rush_share": 0.055,
+     "team_att_pg": 32.353,
+     "team_epa_pp": 0.035,
+     "team_tds_pg": 2.471,
      "epa_db": 0.054,
      "cpoe": 0.042,
      "ypa": 6.671,
@@ -1617,17 +1638,17 @@
     },
     "gamesLastSeason": 16
    },
-   "longPPG": 24.7,
-   "statScoreNow": 0.1,
+   "longPPG": 23.77,
+   "statScoreNow": 0,
    "statScoreLong": 0
   },
   "260": {
    "name": "Josh Johnson",
    "pos": "QB",
    "age": 40.4,
-   "projPPG1": 9.5,
-   "projPPG3": 8.73,
-   "projPPG2": 8.9,
+   "projPPG1": 9.36,
+   "projPPG3": 8.91,
+   "projPPG2": 9.38,
    "survival": [
     0.711,
     0.491,
@@ -1640,26 +1661,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    11.54,
-    13.58,
-    14.55
+    11.89,
+    13.54,
+    14.87
    ],
    "expPPG": [
-    9.87,
-    10.12,
-    9.74
+    10.17,
+    10.09,
+    9.95
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.48,
-    "usage": 0.56,
-    "efficiency": 0.05,
-    "availability": -2.25,
-    "age": -0.63,
+    "recentProduction": -2.91,
+    "usage": 0.53,
+    "teamContext": -0.89,
+    "efficiency": -0.07,
+    "availability": -2.12,
+    "age": -0.4,
     "metrics": {
      "ppg": 8.127,
      "att_pg": 18,
+     "db_pg": 18.667,
      "rush_ppg": 3.833,
+     "car_pg": 4,
+     "rush_share": 0.14,
+     "team_att_pg": 27.588,
+     "team_epa_pp": -0.001,
+     "team_tds_pg": 2.294,
      "epa_db": 0.068,
      "cpoe": 2.027,
      "ypa": 6.889,
@@ -1668,7 +1696,7 @@
     },
     "gamesLastSeason": 3
    },
-   "longPPG": 19.14,
+   "longPPG": 19.45,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -1676,9 +1704,9 @@
    "name": "Matthew Stafford",
    "pos": "QB",
    "age": 38.7,
-   "projPPG1": 16.02,
-   "projPPG3": 14.08,
-   "projPPG2": 14.57,
+   "projPPG1": 16.26,
+   "projPPG3": 14.49,
+   "projPPG2": 14.86,
    "survival": [
     0.766,
     0.561,
@@ -1691,26 +1719,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.34,
-    16.19,
-    15.75
+    16.53,
+    16.01,
+    15.68
    ],
    "expPPG": [
-    14.43,
-    12.64,
-    10.98
+    14.59,
+    12.5,
+    10.93
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.4,
-    "usage": -0.82,
-    "efficiency": 0.67,
-    "availability": 1.18,
-    "age": -0.63,
+    "recentProduction": 0.25,
+    "usage": -1.18,
+    "teamContext": 0.66,
+    "efficiency": 0.59,
+    "availability": 1.12,
+    "age": -0.4,
     "metrics": {
      "ppg": 20.611,
      "att_pg": 35.118,
+     "db_pg": 36.471,
      "rush_ppg": 0.006,
+     "car_pg": 1.706,
+     "rush_share": 0.062,
+     "team_att_pg": 35.176,
+     "team_epa_pp": 0.135,
+     "team_tds_pg": 3.706,
      "epa_db": 0.243,
      "cpoe": 1.536,
      "ypa": 7.884,
@@ -1720,16 +1755,16 @@
     "gamesLastSeason": 17
    },
    "longPPG": 27.19,
-   "statScoreNow": 2.7,
+   "statScoreNow": 5.6,
    "statScoreLong": 0
   },
   "827": {
    "name": "Tyrod Taylor",
    "pos": "QB",
    "age": 37.2,
-   "projPPG1": 11.21,
-   "projPPG3": 9.4,
-   "projPPG2": 10.39,
+   "projPPG1": 11.06,
+   "projPPG3": 8.83,
+   "projPPG2": 9.87,
    "survival": [
     0.815,
     0.638,
@@ -1742,26 +1777,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    12.38,
-    14.4,
-    15.26
+    12.3,
+    14.55,
+    15.35
    ],
    "expPPG": [
-    11.24,
-    11.79,
-    11.27
+    11.16,
+    11.91,
+    11.34
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.58,
-    "usage": 0.36,
-    "efficiency": -0.46,
-    "availability": -1.72,
-    "age": -0.63,
+    "recentProduction": -1.3,
+    "usage": 0.66,
+    "teamContext": -1.1,
+    "efficiency": -0.41,
+    "availability": -1.63,
+    "age": -0.4,
     "metrics": {
      "ppg": 9.91,
      "att_pg": 22.333,
+     "db_pg": 24.667,
      "rush_ppg": 3.383,
+     "car_pg": 4.5,
+     "rush_share": 0.168,
+     "team_att_pg": 29.059,
+     "team_epa_pp": -0.13,
+     "team_tds_pg": 1.529,
      "epa_db": -0.09,
      "cpoe": -0.878,
      "ypa": 5.813,
@@ -1770,7 +1812,7 @@
     },
     "gamesLastSeason": 6
    },
-   "longPPG": 22.06,
+   "longPPG": 22.12,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -1778,9 +1820,9 @@
    "name": "Kirk Cousins",
    "pos": "QB",
    "age": 38.2,
-   "projPPG1": 12.39,
-   "projPPG3": 10.33,
-   "projPPG2": 11.36,
+   "projPPG1": 11.77,
+   "projPPG3": 9.9,
+   "projPPG2": 10.83,
    "survival": [
     0.784,
     0.588,
@@ -1793,26 +1835,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    13.08,
-    14.25,
-    15.37
+    12.73,
+    13.66,
+    15.01
    ],
    "expPPG": [
-    11.66,
-    11.31,
-    10.93
+    11.36,
+    10.84,
+    10.67
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.06,
-    "usage": -0.48,
-    "efficiency": -0.31,
-    "availability": -0.35,
-    "age": -0.63,
+    "recentProduction": -0.85,
+    "usage": -1.09,
+    "teamContext": -0.37,
+    "efficiency": -0.41,
+    "availability": -0.32,
+    "age": -0.4,
     "metrics": {
      "ppg": 10.354,
      "att_pg": 26.9,
+     "db_pg": 28.2,
      "rush_ppg": 0.67,
+     "car_pg": 1.4,
+     "rush_share": 0.05,
+     "team_att_pg": 32.059,
+     "team_epa_pp": -0.014,
+     "team_tds_pg": 2.118,
      "epa_db": -0.003,
      "cpoe": -2.799,
      "ypa": 6.398,
@@ -1821,7 +1870,7 @@
     },
     "gamesLastSeason": 10
    },
-   "longPPG": 24.05,
+   "longPPG": 23.31,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -1882,9 +1931,9 @@
    "name": "Geno Smith",
    "pos": "QB",
    "age": 36,
-   "projPPG1": 14.02,
-   "projPPG3": 11.38,
-   "projPPG2": 12.56,
+   "projPPG1": 13.54,
+   "projPPG3": 10.41,
+   "projPPG2": 11.31,
    "survival": [
     0.851,
     0.698,
@@ -1897,26 +1946,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    13.68,
-    14.24,
-    15.35
+    13.37,
+    14.25,
+    14.95
    ],
    "expPPG": [
-    12.66,
-    12.09,
-    11.9
+    12.37,
+    12.1,
+    11.59
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.38,
-    "usage": -0.52,
-    "efficiency": -0.48,
-    "availability": 0.81,
-    "age": -0.63,
+    "recentProduction": -0.27,
+    "usage": -0.4,
+    "teamContext": -1.07,
+    "efficiency": -0.34,
+    "availability": 0.78,
+    "age": -0.4,
     "metrics": {
      "ppg": 11.593,
      "att_pg": 29.867,
+     "db_pg": 33.533,
      "rush_ppg": 0.727,
+     "car_pg": 2.733,
+     "rush_share": 0.126,
+     "team_att_pg": 30.294,
+     "team_epa_pp": -0.216,
+     "team_tds_pg": 1.471,
      "epa_db": -0.145,
      "cpoe": 0.707,
      "ypa": 6.752,
@@ -1925,7 +1981,7 @@
     },
     "gamesLastSeason": 15
    },
-   "longPPG": 26,
+   "longPPG": 25.58,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -2040,9 +2096,9 @@
    "name": "Jimmy Garoppolo",
    "pos": "QB",
    "age": 35,
-   "projPPG1": 7.27,
-   "projPPG3": 6.76,
-   "projPPG2": 7.19,
+   "projPPG1": 9.31,
+   "projPPG3": 8.54,
+   "projPPG2": 9.63,
    "survival": [
     0.879,
     0.749,
@@ -2055,26 +2111,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    9.25,
-    12.28,
-    13.36
+    11.36,
+    15,
+    14.63
    ],
    "expPPG": [
-    8.69,
-    10.74,
-    10.8
+    10.67,
+    13.12,
+    11.82
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.66,
-    "usage": -0.26,
+    "recentProduction": -3.8,
+    "usage": -0.11,
+    "teamContext": 0.66,
     "efficiency": 0,
-    "availability": -2.39,
-    "age": -0.64,
+    "availability": -2.26,
+    "age": -0.42,
     "metrics": {
      "ppg": -0.333,
      "att_pg": 0,
+     "db_pg": 0,
      "rush_ppg": -0.333,
+     "car_pg": 3,
+     "rush_share": 0.11,
+     "team_att_pg": 35.176,
+     "team_epa_pp": 0.135,
+     "team_tds_pg": 3.706,
      "epa_db": null,
      "cpoe": null,
      "ypa": null,
@@ -2083,7 +2146,7 @@
     },
     "gamesLastSeason": 3
    },
-   "longPPG": 19.3,
+   "longPPG": 22.83,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -2253,9 +2316,9 @@
    "name": "Jameis Winston",
    "pos": "QB",
    "age": 32.8,
-   "projPPG1": 12.83,
-   "projPPG3": 11.53,
-   "projPPG2": 12.13,
+   "projPPG1": 12.22,
+   "projPPG3": 11.06,
+   "projPPG2": 11.9,
    "survival": [
     0.926,
     0.84,
@@ -2268,26 +2331,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    14.64,
-    15.4,
-    16.02
+    14.21,
+    14.97,
+    15.82
    ],
    "expPPG": [
-    14.1,
-    14.17,
-    13.96
+    13.69,
+    13.78,
+    13.78
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.66,
-    "usage": 0.19,
-    "efficiency": 0.55,
-    "availability": -1.93,
-    "age": -0.55,
+    "recentProduction": -0.56,
+    "usage": -0.38,
+    "teamContext": -0.37,
+    "efficiency": 0.52,
+    "availability": -1.8,
+    "age": -0.42,
     "metrics": {
      "ppg": 14.427,
      "att_pg": 22,
+     "db_pg": 23,
      "rush_ppg": 2.767,
+     "car_pg": 2.333,
+     "rush_share": 0.078,
+     "team_att_pg": 30.941,
+     "team_epa_pp": 0.02,
+     "team_tds_pg": 2.529,
      "epa_db": 0.223,
      "cpoe": -3.097,
      "ypa": 8.591,
@@ -2296,7 +2366,7 @@
     },
     "gamesLastSeason": 3
    },
-   "longPPG": 27.17,
+   "longPPG": 26.52,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -2304,9 +2374,9 @@
    "name": "Marcus Mariota",
    "pos": "QB",
    "age": 33,
-   "projPPG1": 13.8,
-   "projPPG3": 12.11,
-   "projPPG2": 13.34,
+   "projPPG1": 13.61,
+   "projPPG3": 12.04,
+   "projPPG2": 13.25,
    "survival": [
     0.923,
     0.834,
@@ -2319,26 +2389,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    14.7,
-    16.26,
-    15.88
+    14.82,
+    16.32,
+    16.19
    ],
    "expPPG": [
-    14.13,
-    14.91,
-    13.76
+    14.25,
+    14.96,
+    14.03
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.33,
-    "usage": 0.41,
-    "efficiency": -0.07,
-    "availability": -0.86,
-    "age": -0.58,
+    "recentProduction": -0.24,
+    "usage": 0.82,
+    "teamContext": -0.89,
+    "efficiency": -0.04,
+    "availability": -0.82,
+    "age": -0.43,
     "metrics": {
      "ppg": 12.55,
      "att_pg": 22.7,
+     "db_pg": 24.3,
      "rush_ppg": 3.57,
+     "car_pg": 5,
+     "rush_share": 0.176,
+     "team_att_pg": 27.588,
+     "team_epa_pp": -0.001,
+     "team_tds_pg": 2.294,
      "epa_db": -0.016,
      "cpoe": 3.197,
      "ypa": 7.467,
@@ -2347,7 +2424,7 @@
     },
     "gamesLastSeason": 10
    },
-   "longPPG": 30.32,
+   "longPPG": 30.62,
    "statScoreNow": 0,
    "statScoreLong": 0.1
   },
@@ -2621,9 +2698,9 @@
    "name": "Carson Wentz",
    "pos": "QB",
    "age": 33.8,
-   "projPPG1": 11.91,
-   "projPPG3": 9.4,
-   "projPPG2": 10.51,
+   "projPPG1": 11.08,
+   "projPPG3": 9.46,
+   "projPPG2": 10.36,
    "survival": [
     0.907,
     0.801,
@@ -2636,26 +2713,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    12.54,
-    13.81,
-    14.97
+    12.43,
+    12.66,
+    14.45
    ],
    "expPPG": [
-    11.96,
-    12.43,
-    12.62
+    11.86,
+    11.4,
+    12.18
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.33,
-    "usage": -0.48,
-    "efficiency": 0.1,
-    "availability": -1.92,
-    "age": -0.68,
+    "recentProduction": -0.28,
+    "usage": -0.73,
+    "teamContext": -1.04,
+    "efficiency": 0.22,
+    "availability": -1.82,
+    "age": -0.49,
     "metrics": {
      "ppg": 14.068,
      "att_pg": 33.8,
+     "db_pg": 37.6,
      "rush_ppg": 1.14,
+     "car_pg": 2.2,
+     "rush_share": 0.091,
+     "team_att_pg": 28.471,
+     "team_epa_pp": -0.12,
+     "team_tds_pg": 1.941,
      "epa_db": 0.034,
      "cpoe": 1.111,
      "ypa": 7.195,
@@ -2664,7 +2748,7 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 23.76,
+   "longPPG": 22.77,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -2672,9 +2756,9 @@
    "name": "Jared Goff",
    "pos": "QB",
    "age": 32,
-   "projPPG1": 16.74,
-   "projPPG3": 14.51,
-   "projPPG2": 15.42,
+   "projPPG1": 16.33,
+   "projPPG3": 14.6,
+   "projPPG2": 15.24,
    "survival": [
     0.936,
     0.864,
@@ -2687,26 +2771,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.91,
-    16.31,
-    16.08
+    16.52,
+    15.67,
+    15.65
    ],
    "expPPG": [
-    16.38,
-    15.2,
-    14.31
+    16,
+    14.6,
+    13.93
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.97,
-    "usage": -0.73,
+    "recentProduction": 0.8,
+    "usage": -1.36,
+    "teamContext": 0.35,
     "efficiency": 0.52,
-    "availability": 1.22,
-    "age": -0.46,
+    "availability": 1.16,
+    "age": -0.36,
     "metrics": {
      "ppg": 17.474,
      "att_pg": 34,
+     "db_pg": 36.235,
      "rush_ppg": 0.265,
+     "car_pg": 1.118,
+     "rush_share": 0.043,
+     "team_att_pg": 34.235,
+     "team_epa_pp": 0.075,
+     "team_tds_pg": 3.294,
      "epa_db": 0.173,
      "cpoe": 1.777,
      "ypa": 7.896,
@@ -2715,9 +2806,9 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 32.63,
-   "statScoreNow": 11.2,
-   "statScoreLong": 2
+   "longPPG": 31.67,
+   "statScoreNow": 6.4,
+   "statScoreLong": 0.5
   },
   "3198": {
    "name": "Derrick Henry",
@@ -2935,9 +3026,9 @@
    "name": "Jacoby Brissett",
    "pos": "QB",
    "age": 33.9,
-   "projPPG1": 12.91,
-   "projPPG3": 11.84,
-   "projPPG2": 11.93,
+   "projPPG1": 13.74,
+   "projPPG3": 12.23,
+   "projPPG2": 12.86,
    "survival": [
     0.906,
     0.799,
@@ -2950,26 +3041,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    13.23,
-    14.27,
-    14.74
+    14.34,
+    15.32,
+    14.86
    ],
    "expPPG": [
-    12.61,
-    12.83,
-    12.4
+    13.67,
+    13.78,
+    12.51
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.35,
-    "usage": -0.35,
-    "efficiency": -0.07,
-    "availability": 0.16,
-    "age": -0.68,
+    "recentProduction": -1.2,
+    "usage": -0.36,
+    "teamContext": 0.45,
+    "efficiency": -0.02,
+    "availability": 0.14,
+    "age": -0.49,
     "metrics": {
      "ppg": 16.246,
      "att_pg": 34.643,
+     "db_pg": 37.714,
      "rush_ppg": 1.629,
+     "car_pg": 2.714,
+     "rush_share": 0.126,
+     "team_att_pg": 38.176,
+     "team_epa_pp": -0.016,
+     "team_tds_pg": 2.235,
      "epa_db": -0.006,
      "cpoe": 1.635,
      "ypa": 6.94,
@@ -2978,7 +3076,7 @@
     },
     "gamesLastSeason": 14
    },
-   "longPPG": 26.8,
+   "longPPG": 28.36,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -3093,9 +3191,9 @@
    "name": "Dak Prescott",
    "pos": "QB",
    "age": 33.2,
-   "projPPG1": 15.91,
-   "projPPG3": 14.04,
-   "projPPG2": 14.83,
+   "projPPG1": 16.42,
+   "projPPG3": 14.45,
+   "projPPG2": 15.43,
    "survival": [
     0.919,
     0.825,
@@ -3108,26 +3206,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.29,
-    16.67,
-    15.86
+    16.77,
+    17.21,
+    16.01
    ],
    "expPPG": [
-    15.63,
-    15.21,
-    13.63
+    16.09,
+    15.71,
+    13.77
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.31,
-    "usage": -0.33,
-    "efficiency": 0.49,
-    "availability": 0.81,
-    "age": -0.61,
+    "recentProduction": 0.23,
+    "usage": -0.36,
+    "teamContext": 0.58,
+    "efficiency": 0.44,
+    "availability": 0.75,
+    "age": -0.45,
     "metrics": {
      "ppg": 18.458,
      "att_pg": 35.294,
+     "db_pg": 37.118,
      "rush_ppg": 1.747,
+     "car_pg": 3.118,
+     "rush_share": 0.114,
+     "team_att_pg": 36.706,
+     "team_epa_pp": 0.094,
+     "team_tds_pg": 2.882,
      "epa_db": 0.181,
      "cpoe": 2.202,
      "ypa": 7.587,
@@ -3136,9 +3241,9 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 31.63,
-   "statScoreNow": 2.1,
-   "statScoreLong": 0.6
+   "longPPG": 32.42,
+   "statScoreNow": 7.6,
+   "statScoreLong": 1.5
   },
   "3423": {
    "name": "Robbie Chosen",
@@ -3252,9 +3357,9 @@
    "name": "Mitchell Trubisky",
    "pos": "QB",
    "age": 32.2,
-   "projPPG1": 11.75,
-   "projPPG3": 9.86,
-   "projPPG2": 10.44,
+   "projPPG1": 11.78,
+   "projPPG3": 10.34,
+   "projPPG2": 11.25,
    "survival": [
     0.934,
     0.86,
@@ -3267,26 +3372,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    14.75,
-    14.83,
-    14.38
+    14.52,
+    15.72,
+    14.82
    ],
    "expPPG": [
-    14.27,
-    13.79,
-    12.75
+    14.05,
+    14.62,
+    13.14
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.22,
-    "usage": -0.29,
-    "efficiency": 2.39,
-    "availability": -1.86,
-    "age": -0.48,
+    "recentProduction": -2.69,
+    "usage": -0.59,
+    "teamContext": -0.21,
+    "efficiency": 2.14,
+    "availability": -1.74,
+    "age": -0.38,
     "metrics": {
      "ppg": 7.78,
      "att_pg": 8.75,
+     "db_pg": 8.75,
      "rush_ppg": 0.15,
+     "car_pg": 2.25,
+     "rush_share": 0.07,
+     "team_att_pg": 29.118,
+     "team_epa_pp": 0.128,
+     "team_tds_pg": 3.471,
      "epa_db": 0.735,
      "cpoe": 7.804,
      "ypa": 8.943,
@@ -3295,7 +3407,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 26.35,
+   "longPPG": 26.95,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -3568,9 +3680,9 @@
    "name": "Patrick Mahomes",
    "pos": "QB",
    "age": 31.1,
-   "projPPG1": 17.43,
-   "projPPG3": 15.31,
-   "projPPG2": 16.19,
+   "projPPG1": 17.4,
+   "projPPG3": 14.95,
+   "projPPG2": 16.11,
    "survival": [
     0.949,
     0.887,
@@ -3583,26 +3695,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    18.24,
-    17.6,
-    17.21
+    17.89,
+    17.72,
+    17.27
    ],
    "expPPG": [
-    17.77,
-    16.61,
-    15.65
+    17.43,
+    16.72,
+    15.69
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.1,
-    "usage": 0.62,
-    "efficiency": 0.28,
-    "availability": 0.57,
-    "age": -0.35,
+    "recentProduction": 0.87,
+    "usage": 0.78,
+    "teamContext": 0.02,
+    "efficiency": 0.25,
+    "availability": 0.55,
+    "age": -0.3,
     "metrics": {
      "ppg": 20.406,
      "att_pg": 35.857,
+     "db_pg": 38.286,
      "rush_ppg": 5.157,
+     "car_pg": 4.571,
+     "rush_share": 0.181,
+     "team_att_pg": 34.353,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 2.235,
      "epa_db": 0.127,
      "cpoe": 0.336,
      "ypa": 7.145,
@@ -3611,9 +3730,9 @@
     },
     "gamesLastSeason": 14
    },
-   "longPPG": 35.56,
-   "statScoreNow": 29.7,
-   "statScoreLong": 26.6
+   "longPPG": 35.41,
+   "statScoreNow": 32.3,
+   "statScoreLong": 27.9
   },
   "4054": {
    "name": "Mo Alie-Cox",
@@ -3990,9 +4109,9 @@
    "name": "Joshua Dobbs",
    "pos": "QB",
    "age": 31.7,
-   "projPPG1": 7.81,
-   "projPPG3": 8.12,
-   "projPPG2": 8.41,
+   "projPPG1": 8.24,
+   "projPPG3": 8.95,
+   "projPPG2": 9.78,
    "survival": [
     0.94,
     0.871,
@@ -4005,26 +4124,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    10.03,
-    12.82,
-    13.49
+    11.08,
+    13.88,
+    14.32
    ],
    "expPPG": [
-    9.73,
-    11.99,
-    12.08
+    10.75,
+    12.99,
+    12.82
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.4,
-    "usage": -0.26,
-    "efficiency": -0.2,
-    "availability": -2.13,
-    "age": -0.43,
+    "recentProduction": -3.59,
+    "usage": -0.35,
+    "teamContext": -0.22,
+    "efficiency": -0.45,
+    "availability": -2.01,
+    "age": -0.34,
     "metrics": {
      "ppg": 0.525,
      "att_pg": 2.5,
+     "db_pg": 2.5,
      "rush_ppg": -0.125,
+     "car_pg": 2.5,
+     "rush_share": 0.086,
+     "team_att_pg": 29.529,
+     "team_epa_pp": 0.143,
+     "team_tds_pg": 3.118,
      "epa_db": -0.007,
      "cpoe": 5.946,
      "ypa": 6.5,
@@ -4033,7 +4159,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 21.59,
+   "longPPG": 23.38,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -4571,9 +4697,9 @@
    "name": "Nick Mullens",
    "pos": "QB",
    "age": 31.6,
-   "projPPG1": 11.55,
-   "projPPG3": 6.21,
-   "projPPG2": 8.58,
+   "projPPG1": 12.29,
+   "projPPG3": 7.14,
+   "projPPG2": 9.82,
    "survival": [
     0.942,
     0.875,
@@ -4586,26 +4712,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    15.02,
-    14.46,
-    13.26
+    14.66,
+    17.12,
+    14.04
    ],
    "expPPG": [
-    14.58,
-    13.56,
-    11.92
+    14.24,
+    16.05,
+    12.62
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.5,
-    "usage": -0.25,
-    "efficiency": 3.52,
-    "availability": -2.04,
-    "age": -0.41,
+    "recentProduction": -3.67,
+    "usage": -0.14,
+    "teamContext": 0.06,
+    "efficiency": 3.08,
+    "availability": -1.92,
+    "age": -0.33,
     "metrics": {
      "ppg": -0.01,
      "att_pg": 0.75,
+     "db_pg": 0.75,
      "rush_ppg": -0.2,
+     "car_pg": 3,
+     "rush_share": 0.104,
+     "team_att_pg": 33.118,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 3,
      "epa_db": 0.967,
      "cpoe": 28.958,
      "ypa": 6.333,
@@ -4614,7 +4747,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 25.95,
+   "longPPG": 27.7,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -4622,9 +4755,9 @@
    "name": "Cooper Rush",
    "pos": "QB",
    "age": 32.9,
-   "projPPG1": 8.07,
-   "projPPG3": 7.63,
-   "projPPG2": 8.53,
+   "projPPG1": 7.02,
+   "projPPG3": 8.29,
+   "projPPG2": 8.96,
    "survival": [
     0.924,
     0.836,
@@ -4637,26 +4770,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    9.09,
-    12.03,
-    14.34
+    9.51,
+    10.61,
+    14.26
    ],
    "expPPG": [
-    8.75,
-    11.05,
-    12.44
+    9.14,
+    9.74,
+    12.38
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.94,
-    "usage": -0.44,
-    "efficiency": -1.52,
-    "availability": -1.68,
-    "age": -0.57,
+    "recentProduction": -2.32,
+    "usage": -1.13,
+    "teamContext": -1.08,
+    "efficiency": -1.69,
+    "availability": -1.56,
+    "age": -0.43,
     "metrics": {
      "ppg": 0.43,
      "att_pg": 13,
+     "db_pg": 13.25,
      "rush_ppg": -0.1,
+     "car_pg": 1,
+     "rush_share": 0.034,
+     "team_att_pg": 24.824,
+     "team_epa_pp": 0.048,
+     "team_tds_pg": 2.706,
      "epa_db": -0.356,
      "cpoe": -1.94,
      "ypa": 5.827,
@@ -4665,7 +4805,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 20.49,
+   "longPPG": 19.89,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -4777,9 +4917,9 @@
    "name": "Lamar Jackson",
    "pos": "QB",
    "age": 29.8,
-   "projPPG1": 18.04,
-   "projPPG3": 15.09,
-   "projPPG2": 16.96,
+   "projPPG1": 17.29,
+   "projPPG3": 14.78,
+   "projPPG2": 16.13,
    "survival": [
     0.958,
     0.911,
@@ -4792,26 +4932,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    18.39,
-    17.85,
-    17.34
+    17.58,
+    17.29,
+    17.4
    ],
    "expPPG": [
-    18,
-    17.05,
-    16.09
+    17.21,
+    16.52,
+    16.15
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.9,
-    "usage": 0.41,
-    "efficiency": 0.28,
-    "availability": 0.4,
+    "recentProduction": 1.64,
+    "usage": 0.81,
+    "teamContext": -1.08,
+    "efficiency": 0.5,
+    "availability": 0.39,
     "age": -0.19,
     "metrics": {
      "ppg": 16.528,
      "att_pg": 23.231,
+     "db_pg": 26,
      "rush_ppg": 3.608,
+     "car_pg": 5.154,
+     "rush_share": 0.173,
+     "team_att_pg": 24.824,
+     "team_epa_pp": 0.048,
+     "team_tds_pg": 2.706,
      "epa_db": 0.054,
      "cpoe": 1.759,
      "ypa": 8.44,
@@ -4820,17 +4967,17 @@
     },
     "gamesLastSeason": 13
    },
-   "longPPG": 36.34,
-   "statScoreNow": 52.9,
-   "statScoreLong": 40.2
+   "longPPG": 35.38,
+   "statScoreNow": 28.5,
+   "statScoreLong": 27.3
   },
   "4892": {
    "name": "Baker Mayfield",
    "pos": "QB",
    "age": 31.5,
-   "projPPG1": 16.99,
-   "projPPG3": 14.83,
-   "projPPG2": 16.13,
+   "projPPG1": 16.46,
+   "projPPG3": 14.24,
+   "projPPG2": 15.28,
    "survival": [
     0.943,
     0.877,
@@ -4843,26 +4990,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    17.21,
-    17.15,
-    16.92
+    16.54,
+    16.77,
+    16.68
    ],
    "expPPG": [
-    16.72,
-    16.09,
-    15.23
+    16.07,
+    15.74,
+    15.01
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.19,
-    "usage": -0.03,
-    "efficiency": -0.21,
-    "availability": 1.22,
-    "age": -0.4,
+    "recentProduction": 1.02,
+    "usage": -0.17,
+    "teamContext": -0.22,
+    "efficiency": -0.24,
+    "availability": 1.16,
+    "age": -0.33,
     "metrics": {
      "ppg": 15.995,
      "att_pg": 31.941,
+     "db_pg": 34.059,
      "rush_ppg": 2.6,
+     "car_pg": 3.235,
+     "rush_share": 0.117,
+     "team_att_pg": 32.824,
+     "team_epa_pp": -0.01,
+     "team_tds_pg": 2.294,
      "epa_db": 0.001,
      "cpoe": -2.116,
      "ypa": 6.801,
@@ -4871,17 +5025,17 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 34.12,
-   "statScoreNow": 16.7,
-   "statScoreLong": 9.2
+   "longPPG": 33.22,
+   "statScoreNow": 8.2,
+   "statScoreLong": 3.9
   },
   "4943": {
    "name": "Sam Darnold",
    "pos": "QB",
    "age": 29.4,
-   "projPPG1": 16.66,
-   "projPPG3": 14.44,
-   "projPPG2": 15.58,
+   "projPPG1": 15.54,
+   "projPPG3": 14.03,
+   "projPPG2": 14.67,
    "survival": [
     0.961,
     0.916,
@@ -4894,26 +5048,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.79,
-    16.18,
-    15.81
+    15.98,
+    15.49,
+    15.44
    ],
    "expPPG": [
-    16.46,
-    15.5,
-    14.75
+    15.67,
+    14.84,
+    14.41
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.33,
-    "usage": -0.53,
+    "recentProduction": 0.31,
+    "usage": -0.89,
+    "teamContext": -0.68,
     "efficiency": 0.55,
-    "availability": 1.22,
-    "age": -0.13,
+    "availability": 1.16,
+    "age": -0.15,
     "metrics": {
      "ppg": 13.848,
      "att_pg": 28.059,
+     "db_pg": 29.647,
      "rush_ppg": 0.559,
+     "car_pg": 2.059,
+     "rush_share": 0.069,
+     "team_att_pg": 28.294,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 2.588,
      "epa_db": 0.148,
      "cpoe": 5.155,
      "ypa": 8.486,
@@ -4922,9 +5083,9 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 33.19,
-   "statScoreNow": 9.8,
-   "statScoreLong": 3.7
+   "longPPG": 31.89,
+   "statScoreNow": 1.1,
+   "statScoreLong": 0.7
   },
   "4950": {
    "name": "Christian Kirk",
@@ -4984,9 +5145,9 @@
    "name": "Mason Rudolph",
    "pos": "QB",
    "age": 31.3,
-   "projPPG1": 10.77,
-   "projPPG3": 8.62,
-   "projPPG2": 10.22,
+   "projPPG1": 10.57,
+   "projPPG3": 8.71,
+   "projPPG2": 10.44,
    "survival": [
     0.947,
     0.883,
@@ -4999,26 +5160,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    12.4,
-    13.92,
-    14.7
+    12.3,
+    14.45,
+    14.82
    ],
    "expPPG": [
-    12.07,
-    13.11,
-    13.31
+    11.97,
+    13.61,
+    13.42
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.12,
-    "usage": -0.33,
-    "efficiency": 0.02,
-    "availability": -1.65,
-    "age": -0.37,
+    "recentProduction": -1.65,
+    "usage": -0.82,
+    "teamContext": -0.19,
+    "efficiency": -0.14,
+    "availability": -1.55,
+    "age": -0.31,
     "metrics": {
      "ppg": 3,
      "att_pg": 10.4,
+     "db_pg": 10.8,
      "rush_ppg": 0.12,
+     "car_pg": 1.4,
+     "rush_share": 0.058,
+     "team_att_pg": 32.353,
+     "team_epa_pp": 0.035,
+     "team_tds_pg": 2.471,
      "epa_db": 0.046,
      "cpoe": 5.762,
      "ypa": 5.962,
@@ -5027,7 +5195,7 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 24.67,
+   "longPPG": 24.99,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -5143,9 +5311,9 @@
    "name": "Josh Allen",
    "pos": "QB",
    "age": 30.4,
-   "projPPG1": 20.66,
-   "projPPG3": 17.79,
-   "projPPG2": 19.51,
+   "projPPG1": 20.31,
+   "projPPG3": 17.96,
+   "projPPG2": 19.11,
    "survival": [
     0.954,
     0.901,
@@ -5158,26 +5326,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    21.54,
-    20.64,
-    18.75
+    20.61,
+    19.8,
+    18.92
    ],
    "expPPG": [
-    21.04,
-    19.61,
-    17.23
+    20.14,
+    18.82,
+    17.39
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 2.43,
-    "usage": 1.79,
-    "efficiency": 0.53,
-    "availability": 0.98,
-    "age": -0.27,
+    "recentProduction": 2,
+    "usage": 2.03,
+    "teamContext": -0.21,
+    "efficiency": 0.6,
+    "availability": 0.93,
+    "age": -0.25,
     "metrics": {
      "ppg": 22.789,
      "att_pg": 28.75,
+     "db_pg": 31.25,
      "rush_ppg": 8.869,
+     "car_pg": 7,
+     "rush_share": 0.218,
+     "team_att_pg": 29.118,
+     "team_epa_pp": 0.128,
+     "team_tds_pg": 3.471,
      "epa_db": 0.143,
      "cpoe": 3.515,
      "ypa": 7.974,
@@ -5186,9 +5361,9 @@
     },
     "gamesLastSeason": 16
    },
-   "longPPG": 41.25,
-   "statScoreNow": 99.6,
-   "statScoreLong": 98.4
+   "longPPG": 40.09,
+   "statScoreNow": 99.2,
+   "statScoreLong": 97.2
   },
   "4992": {
    "name": "Dante Pettis",
@@ -6206,9 +6381,9 @@
    "name": "Kyler Murray",
    "pos": "QB",
    "age": 29.2,
-   "projPPG1": 14.81,
-   "projPPG3": 11.98,
-   "projPPG2": 13.24,
+   "projPPG1": 16.35,
+   "projPPG3": 12.97,
+   "projPPG2": 14.81,
    "survival": [
     0.962,
     0.919,
@@ -6221,26 +6396,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    15.96,
-    15.45,
-    16.76
+    17.11,
+    17.42,
+    17.69
    ],
    "expPPG": [
-    15.66,
-    14.82,
-    15.68
+    16.78,
+    16.72,
+    16.55
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.44,
-    "usage": 0.54,
-    "efficiency": -0.06,
-    "availability": -1.24,
-    "age": -0.11,
+    "recentProduction": 0.38,
+    "usage": 1.6,
+    "teamContext": 0.45,
+    "efficiency": -0.04,
+    "availability": -1.14,
+    "age": -0.13,
     "metrics": {
      "ppg": 15.556,
      "att_pg": 32.2,
+     "db_pg": 35.4,
      "rush_ppg": 4.66,
+     "car_pg": 5.8,
+     "rush_share": 0.269,
+     "team_att_pg": 38.176,
+     "team_epa_pp": -0.016,
+     "team_tds_pg": 2.235,
      "epa_db": 0.032,
      "cpoe": -0.529,
      "ypa": 5.975,
@@ -6249,9 +6431,9 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 29.69,
-   "statScoreNow": 0.1,
-   "statScoreLong": 0
+   "longPPG": 32.21,
+   "statScoreNow": 6.7,
+   "statScoreLong": 1.1
   },
   "5850": {
    "name": "Josh Jacobs",
@@ -6309,9 +6491,9 @@
    "name": "Drew Lock",
    "pos": "QB",
    "age": 29.9,
-   "projPPG1": 8.3,
-   "projPPG3": 9.24,
-   "projPPG2": 10.13,
+   "projPPG1": 7.73,
+   "projPPG3": 9.05,
+   "projPPG2": 9.7,
    "survival": [
     0.957,
     0.909,
@@ -6324,26 +6506,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    10.26,
-    13.9,
-    15.36
+    10.17,
+    13.77,
+    15.71
    ],
    "expPPG": [
-    10.04,
-    13.27,
-    14.22
+    9.95,
+    13.15,
+    14.55
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.59,
-    "usage": -0.24,
-    "efficiency": -1.76,
-    "availability": -2.11,
+    "recentProduction": -2.01,
+    "usage": -0.55,
+    "teamContext": -0.68,
+    "efficiency": -2.06,
+    "availability": -1.98,
     "age": -0.21,
     "metrics": {
      "ppg": 0.033,
      "att_pg": 1,
+     "db_pg": 1,
      "rush_ppg": -0.167,
+     "car_pg": 2,
+     "rush_share": 0.067,
+     "team_att_pg": 28.294,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 2.588,
      "epa_db": -0.298,
      "cpoe": -14.29,
      "ypa": 5,
@@ -6352,7 +6541,7 @@
     },
     "gamesLastSeason": 3
    },
-   "longPPG": 23.85,
+   "longPPG": 23.9,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -6467,9 +6656,9 @@
    "name": "Daniel Jones",
    "pos": "QB",
    "age": 29.4,
-   "projPPG1": 15.94,
-   "projPPG3": 14.72,
-   "projPPG2": 15.21,
+   "projPPG1": 15.78,
+   "projPPG3": 14.97,
+   "projPPG2": 15.37,
    "survival": [
     0.961,
     0.916,
@@ -6482,26 +6671,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.88,
-    16.75,
-    16.19
+    16.77,
+    16.63,
+    16.27
    ],
    "expPPG": [
-    16.55,
-    16.05,
-    15.1
+    16.44,
+    15.93,
+    15.18
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.01,
-    "usage": 0.28,
-    "efficiency": 0.49,
-    "availability": 0.08,
-    "age": -0.13,
+    "recentProduction": -0.03,
+    "usage": 0.16,
+    "teamContext": 0.02,
+    "efficiency": 0.48,
+    "availability": 0.07,
+    "age": -0.15,
     "metrics": {
      "ppg": 17.418,
      "att_pg": 29.538,
+     "db_pg": 31.231,
      "rush_ppg": 3.569,
+     "car_pg": 3.462,
+     "rush_share": 0.133,
+     "team_att_pg": 32.176,
+     "team_epa_pp": 0.08,
+     "team_tds_pg": 3.059,
      "epa_db": 0.161,
      "cpoe": 2.297,
      "ypa": 8.076,
@@ -6510,9 +6706,9 @@
     },
     "gamesLastSeason": 13
    },
-   "longPPG": 33.86,
-   "statScoreNow": 2.2,
-   "statScoreLong": 7.3
+   "longPPG": 33.75,
+   "statScoreNow": 2,
+   "statScoreLong": 7
   },
   "5872": {
    "name": "Deebo Samuel Sr.",
@@ -7156,9 +7352,9 @@
    "name": "Gardner Minshew",
    "pos": "QB",
    "age": 30.4,
-   "projPPG1": 7.34,
-   "projPPG3": 8.98,
-   "projPPG2": 9.54,
+   "projPPG1": 7.26,
+   "projPPG3": 8.67,
+   "projPPG2": 9.44,
    "survival": [
     0.954,
     0.9,
@@ -7171,26 +7367,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    9.25,
-    13.36,
-    15.54
+    9.43,
+    13.66,
+    15.88
    ],
    "expPPG": [
-    9.03,
-    12.7,
-    14.28
+    9.22,
+    12.98,
+    14.59
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.92,
-    "usage": -0.22,
-    "efficiency": -2.7,
-    "availability": -1.77,
-    "age": -0.28,
+    "recentProduction": -2.3,
+    "usage": -0.7,
+    "teamContext": 0.02,
+    "efficiency": -3.09,
+    "availability": -1.65,
+    "age": -0.25,
     "metrics": {
      "ppg": -0.08,
      "att_pg": 3.25,
+     "db_pg": 3.25,
      "rush_ppg": 0.05,
+     "car_pg": 1.5,
+     "rush_share": 0.059,
+     "team_att_pg": 34.353,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 2.235,
      "epa_db": -0.493,
      "cpoe": -20.53,
      "ypa": 2.846,
@@ -7199,7 +7402,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 22.81,
+   "longPPG": 23.3,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -7901,9 +8104,9 @@
    "name": "Tua Tagovailoa",
    "pos": "QB",
    "age": 28.6,
-   "projPPG1": 14.74,
-   "projPPG3": 12.83,
-   "projPPG2": 13.87,
+   "projPPG1": 13.4,
+   "projPPG3": 12.31,
+   "projPPG2": 12.96,
    "survival": [
     0.965,
     0.925,
@@ -7916,26 +8119,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    15.02,
-    15.28,
-    15.4
+    14.06,
+    14.04,
+    14.86
    ],
    "expPPG": [
-    14.76,
-    14.71,
-    14.49
+    13.82,
+    13.52,
+    13.97
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.26,
-    "usage": -0.59,
+    "recentProduction": -0.15,
+    "usage": -1.11,
+    "teamContext": -0.86,
     "efficiency": 0.05,
-    "availability": 0.34,
-    "age": -0.02,
+    "availability": 0.32,
+    "age": -0.06,
     "metrics": {
      "ppg": 11.479,
      "att_pg": 27.429,
+     "db_pg": 29.571,
      "rush_ppg": 0.307,
+     "car_pg": 1.429,
+     "rush_share": 0.056,
+     "team_att_pg": 28.176,
+     "team_epa_pp": -0.008,
+     "team_tds_pg": 2.176,
      "epa_db": 0.035,
      "cpoe": 2.02,
      "ypa": 6.927,
@@ -7944,17 +8154,17 @@
     },
     "gamesLastSeason": 14
    },
-   "longPPG": 31.13,
-   "statScoreNow": 0.1,
-   "statScoreLong": 0.3
+   "longPPG": 29.23,
+   "statScoreNow": 0,
+   "statScoreLong": 0
   },
   "6770": {
    "name": "Joe Burrow",
    "pos": "QB",
    "age": 29.9,
-   "projPPG1": 15.54,
-   "projPPG3": 12.32,
-   "projPPG2": 13.92,
+   "projPPG1": 15.6,
+   "projPPG3": 12.54,
+   "projPPG2": 14.14,
    "survival": [
     0.958,
     0.91,
@@ -7967,26 +8177,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    16.2,
-    15.53,
-    16.2
+    16.12,
+    15.78,
+    16.05
    ],
    "expPPG": [
-    15.85,
-    14.83,
-    15.02
+    15.78,
+    15.07,
+    14.88
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.36,
-    "usage": -0.63,
-    "efficiency": 0.41,
-    "availability": -0.63,
+    "recentProduction": 1.16,
+    "usage": -0.96,
+    "teamContext": 0.57,
+    "efficiency": 0.36,
+    "availability": -0.57,
     "age": -0.2,
     "metrics": {
      "ppg": 16.808,
      "att_pg": 32.375,
+     "db_pg": 34.5,
      "rush_ppg": 0.513,
+     "car_pg": 1.75,
+     "rush_share": 0.078,
+     "team_att_pg": 37.647,
+     "team_epa_pp": 0.019,
+     "team_tds_pg": 2.765,
      "epa_db": 0.133,
      "cpoe": 4.654,
      "ypa": 6.985,
@@ -7995,8 +8212,8 @@
     },
     "gamesLastSeason": 8
    },
-   "longPPG": 29.45,
-   "statScoreNow": 0.8,
+   "longPPG": 29.48,
+   "statScoreNow": 1.3,
    "statScoreLong": 0
   },
   "6783": {
@@ -8217,9 +8434,9 @@
    "name": "Justin Herbert",
    "pos": "QB",
    "age": 28.6,
-   "projPPG1": 17.27,
-   "projPPG3": 15.37,
-   "projPPG2": 16.12,
+   "projPPG1": 17.44,
+   "projPPG3": 15.1,
+   "projPPG2": 15.89,
    "survival": [
     0.965,
     0.926,
@@ -8232,26 +8449,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    17.51,
-    16.86,
-    16.61
+    17.45,
+    17.39,
+    16.81
    ],
    "expPPG": [
-    17.2,
-    16.23,
-    15.62
+    17.14,
+    16.75,
+    15.81
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.63,
-    "usage": 0.32,
-    "efficiency": 0.1,
-    "availability": 1.02,
-    "age": -0.02,
+    "recentProduction": 0.5,
+    "usage": 0.81,
+    "teamContext": -0.21,
+    "efficiency": 0.2,
+    "availability": 0.97,
+    "age": -0.06,
     "metrics": {
      "ppg": 17.93,
      "att_pg": 32,
+     "db_pg": 35.375,
      "rush_ppg": 3.863,
+     "car_pg": 5.188,
+     "rush_share": 0.189,
+     "team_att_pg": 33.471,
+     "team_epa_pp": -0.027,
+     "team_tds_pg": 2.118,
      "epa_db": 0.028,
      "cpoe": 1.575,
      "ypa": 7.279,
@@ -8260,9 +8484,9 @@
     },
     "gamesLastSeason": 16
    },
-   "longPPG": 34.84,
-   "statScoreNow": 24.5,
-   "statScoreLong": 16.4
+   "longPPG": 35.28,
+   "statScoreNow": 33.8,
+   "statScoreLong": 25.5
   },
   "6801": {
    "name": "Tee Higgins",
@@ -8322,9 +8546,9 @@
    "name": "Jordan Love",
    "pos": "QB",
    "age": 28,
-   "projPPG1": 16.59,
-   "projPPG3": 14.44,
-   "projPPG2": 15.33,
+   "projPPG1": 15.86,
+   "projPPG3": 14.32,
+   "projPPG2": 15.18,
    "survival": [
     0.968,
     0.932,
@@ -8337,26 +8561,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    17.15,
-    16.6,
-    15.88
+    16.57,
+    15.9,
+    15.87
    ],
    "expPPG": [
-    16.87,
-    16.04,
-    15.02
+    16.3,
+    15.36,
+    15.01
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.13,
-    "usage": -0.34,
-    "efficiency": 0.78,
-    "availability": 0.72,
-    "age": 0.07,
+    "recentProduction": 0.11,
+    "usage": -0.37,
+    "teamContext": -0.52,
+    "efficiency": 0.7,
+    "availability": 0.69,
+    "age": 0.01,
     "metrics": {
      "ppg": 15.676,
      "att_pg": 29.267,
+     "db_pg": 30.667,
      "rush_ppg": 1.327,
+     "car_pg": 3.133,
+     "rush_share": 0.108,
+     "team_att_pg": 28.765,
+     "team_epa_pp": 0.103,
+     "team_tds_pg": 2.588,
      "epa_db": 0.24,
      "cpoe": 5.533,
      "ypa": 7.702,
@@ -8365,9 +8596,9 @@
     },
     "gamesLastSeason": 15
    },
-   "longPPG": 34.06,
-   "statScoreNow": 8.6,
-   "statScoreLong": 8.8
+   "longPPG": 33.13,
+   "statScoreNow": 2.4,
+   "statScoreLong": 3.6
   },
   "6806": {
    "name": "J.K. Dobbins",
@@ -8850,9 +9081,9 @@
    "name": "Jalen Hurts",
    "pos": "QB",
    "age": 28.2,
-   "projPPG1": 18.72,
-   "projPPG3": 16.4,
-   "projPPG2": 17.78,
+   "projPPG1": 18.54,
+   "projPPG3": 16.17,
+   "projPPG2": 17.26,
    "survival": [
     0.967,
     0.93,
@@ -8865,26 +9096,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    19.26,
-    18.94,
-    17.57
+    18.75,
+    18.8,
+    17.96
    ],
    "expPPG": [
-    18.95,
-    18.28,
-    16.59
+    18.44,
+    18.15,
+    16.96
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.46,
-    "usage": 0.88,
-    "efficiency": 0.19,
-    "availability": 0.93,
-    "age": 0.04,
+    "recentProduction": 1.22,
+    "usage": 1.64,
+    "teamContext": -0.58,
+    "efficiency": 0.18,
+    "availability": 0.88,
+    "age": -0.02,
     "metrics": {
      "ppg": 18.816,
      "att_pg": 28.375,
+     "db_pg": 30.375,
      "rush_ppg": 5.631,
+     "car_pg": 6.563,
+     "rush_share": 0.233,
+     "team_att_pg": 29.235,
+     "team_epa_pp": 0.021,
+     "team_tds_pg": 2.529,
      "epa_db": 0.071,
      "cpoe": 3.183,
      "ypa": 7.101,
@@ -8893,9 +9131,9 @@
     },
     "gamesLastSeason": 16
    },
-   "longPPG": 38.27,
-   "statScoreNow": 77.2,
-   "statScoreLong": 75.4
+   "longPPG": 38.01,
+   "statScoreNow": 74.9,
+   "statScoreLong": 78.9
   },
   "6920": {
    "name": "Isaiah Hodgins",
@@ -9488,9 +9726,9 @@
    "name": "Tyler Huntley",
    "pos": "QB",
    "age": 28.7,
-   "projPPG1": 12.9,
-   "projPPG3": 9.99,
-   "projPPG2": 11.58,
+   "projPPG1": 12.59,
+   "projPPG3": 10.64,
+   "projPPG2": 12.17,
    "survival": [
     0.965,
     0.925,
@@ -9503,26 +9741,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    14.31,
-    14.88,
-    15.02
+    14.15,
+    14.79,
+    15.41
    ],
    "expPPG": [
-    14.06,
-    14.32,
-    14.12
+    13.9,
+    14.24,
+    14.48
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.44,
-    "usage": 0.43,
-    "efficiency": 0.51,
-    "availability": -1.79,
-    "age": -0.03,
+    "recentProduction": -1.15,
+    "usage": 0.76,
+    "teamContext": -1.08,
+    "efficiency": 0.6,
+    "availability": -1.68,
+    "age": -0.07,
     "metrics": {
      "ppg": 8.028,
      "att_pg": 13.4,
+     "db_pg": 15,
      "rush_ppg": 3.02,
+     "car_pg": 4.8,
+     "rush_share": 0.161,
+     "team_att_pg": 24.824,
+     "team_epa_pp": 0.048,
+     "team_tds_pg": 2.706,
      "epa_db": 0.075,
      "cpoe": 12.931,
      "ypa": 6.358,
@@ -9531,7 +9776,7 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 27.33,
+   "longPPG": 27.37,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -9699,9 +9944,9 @@
    "name": "Trevor Lawrence",
    "pos": "QB",
    "age": 27,
-   "projPPG1": 17.56,
-   "projPPG3": 16.9,
-   "projPPG2": 17.11,
+   "projPPG1": 17.43,
+   "projPPG3": 16.95,
+   "projPPG2": 16.81,
    "survival": [
     0.969,
     0.937,
@@ -9714,26 +9959,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    18.1,
-    18.17,
-    16.96
+    17.77,
+    17.5,
+    17.01
    ],
    "expPPG": [
-    17.82,
-    17.59,
-    16.13
+    17.49,
+    16.95,
+    16.18
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.49,
-    "usage": 0.7,
-    "efficiency": 0.04,
-    "availability": 0.9,
-    "age": 0.2,
+    "recentProduction": 0.35,
+    "usage": 0.79,
+    "teamContext": 0.06,
+    "efficiency": 0.03,
+    "availability": 0.84,
+    "age": 0.12,
     "metrics": {
      "ppg": 19.893,
      "att_pg": 32.941,
+     "db_pg": 35.353,
      "rush_ppg": 5.288,
+     "car_pg": 4.824,
+     "rush_share": 0.168,
+     "team_att_pg": 33.118,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 3,
      "epa_db": 0.064,
      "cpoe": -1.882,
      "ypa": 7.155,
@@ -9742,9 +9994,9 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 36.6,
-   "statScoreNow": 34.3,
-   "statScoreLong": 45.2
+   "longPPG": 35.93,
+   "statScoreNow": 33.4,
+   "statScoreLong": 37.8
   },
   "7525": {
    "name": "DeVonta Smith",
@@ -9858,9 +10110,9 @@
    "name": "Mac Jones",
    "pos": "QB",
    "age": 28.1,
-   "projPPG1": 13.48,
-   "projPPG3": 12.33,
-   "projPPG2": 12.65,
+   "projPPG1": 13.96,
+   "projPPG3": 13.12,
+   "projPPG2": 13.68,
    "survival": [
     0.968,
     0.931,
@@ -9873,26 +10125,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    14.35,
-    14.66,
-    14.83
+    15.08,
+    15.26,
+    15.3
    ],
    "expPPG": [
-    14.11,
-    14.15,
-    14.02
+    14.84,
+    14.73,
+    14.46
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.39,
-    "usage": -0.51,
-    "efficiency": 0.42,
-    "availability": -0.33,
-    "age": 0.05,
+    "recentProduction": -1.15,
+    "usage": -0.34,
+    "teamContext": 0.17,
+    "efficiency": 0.38,
+    "availability": -0.31,
+    "age": -0.01,
     "metrics": {
      "ppg": 11.822,
      "att_pg": 26.273,
+     "db_pg": 27.727,
      "rush_ppg": 0.545,
+     "car_pg": 3.273,
+     "rush_share": 0.116,
+     "team_att_pg": 33.765,
+     "team_epa_pp": 0.082,
+     "team_tds_pg": 2.824,
      "epa_db": 0.147,
      "cpoe": 3.679,
      "ypa": 7.443,
@@ -9901,9 +10160,9 @@
     },
     "gamesLastSeason": 11
    },
-   "longPPG": 29.93,
+   "longPPG": 31.19,
    "statScoreNow": 0,
-   "statScoreLong": 0
+   "statScoreLong": 0.2
   },
   "7528": {
    "name": "Najee Harris",
@@ -10172,9 +10431,9 @@
    "name": "Zach Wilson",
    "pos": "QB",
    "age": 27.2,
-   "projPPG1": 5.81,
-   "projPPG3": 8.82,
-   "projPPG2": 8.3,
+   "projPPG1": 4.65,
+   "projPPG3": 8.12,
+   "projPPG2": 7.76,
    "survival": [
     0.968,
     0.936,
@@ -10187,26 +10446,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    7.49,
-    12.33,
-    13.83
+    7.38,
+    10.99,
+    13.75
    ],
    "expPPG": [
-    7.37,
-    11.93,
-    13.14
+    7.26,
+    10.64,
+    13.06
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.45,
-    "usage": -0.21,
-    "efficiency": -2.7,
-    "availability": -2.22,
-    "age": 0.17,
+    "recentProduction": -3.63,
+    "usage": -1.02,
+    "teamContext": -0.86,
+    "efficiency": -3.05,
+    "availability": -2.1,
+    "age": 0.1,
     "metrics": {
      "ppg": 0.345,
      "att_pg": 2.75,
+     "db_pg": 2.75,
      "rush_ppg": 0.025,
+     "car_pg": 0.75,
+     "rush_share": 0.03,
+     "team_att_pg": 28.176,
+     "team_epa_pp": -0.008,
+     "team_tds_pg": 2.176,
      "epa_db": -0.602,
      "cpoe": -7.366,
      "ypa": 2.909,
@@ -10215,7 +10481,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 20.48,
+   "longPPG": 19.53,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -10650,9 +10916,9 @@
    "name": "Davis Mills",
    "pos": "QB",
    "age": 28,
-   "projPPG1": 10.13,
-   "projPPG3": 11.27,
-   "projPPG2": 10.45,
+   "projPPG1": 9.82,
+   "projPPG3": 11.05,
+   "projPPG2": 10.78,
    "survival": [
     0.968,
     0.932,
@@ -10665,26 +10931,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    11.62,
-    13.44,
-    14.65
+    11.82,
+    12.95,
+    14.56
    ],
    "expPPG": [
-    11.43,
-    12.98,
-    13.85
+    11.62,
+    12.51,
+    13.77
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.67,
-    "usage": -0.1,
-    "efficiency": -0.76,
-    "availability": -1.63,
-    "age": 0.07,
+    "recentProduction": -2.27,
+    "usage": -0.59,
+    "teamContext": -0.14,
+    "efficiency": -0.88,
+    "availability": -1.54,
+    "age": 0.01,
     "metrics": {
      "ppg": 11.433,
      "att_pg": 26.5,
+     "db_pg": 27.833,
      "rush_ppg": 2,
+     "car_pg": 2.167,
+     "rush_share": 0.078,
+     "team_att_pg": 34.235,
+     "team_epa_pp": -0.013,
+     "team_tds_pg": 1.941,
      "epa_db": -0.1,
      "cpoe": -6.613,
      "ypa": 5.755,
@@ -10693,7 +10966,7 @@
     },
     "gamesLastSeason": 6
    },
-   "longPPG": 24.45,
+   "longPPG": 24.23,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -10807,9 +11080,9 @@
    "name": "Justin Fields",
    "pos": "QB",
    "age": 27.6,
-   "projPPG1": 15.06,
-   "projPPG3": 14.15,
-   "projPPG2": 14.58,
+   "projPPG1": 15.34,
+   "projPPG3": 13.51,
+   "projPPG2": 14.19,
    "survival": [
     0.968,
     0.934,
@@ -10822,26 +11095,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    16.24,
-    16.84,
-    16.78
+    16.16,
+    17.53,
+    17.4
    ],
    "expPPG": [
-    15.97,
-    16.28,
-    15.91
+    15.9,
+    16.95,
+    16.49
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.47,
-    "usage": 1.35,
-    "efficiency": -0.41,
-    "availability": -0.74,
-    "age": 0.12,
+    "recentProduction": -0.42,
+    "usage": 2.56,
+    "teamContext": -1.1,
+    "efficiency": -0.28,
+    "availability": -0.69,
+    "age": 0.05,
     "metrics": {
      "ppg": 15.851,
      "att_pg": 22.667,
+     "db_pg": 25.667,
      "rush_ppg": 6.922,
+     "car_pg": 7.889,
+     "rush_share": 0.294,
+     "team_att_pg": 29.059,
+     "team_epa_pp": -0.13,
+     "team_tds_pg": 1.529,
      "epa_db": -0.097,
      "cpoe": -1.869,
      "ypa": 6.172,
@@ -10850,9 +11130,9 @@
     },
     "gamesLastSeason": 9
    },
-   "longPPG": 30.98,
-   "statScoreNow": 0.2,
-   "statScoreLong": 0.2
+   "longPPG": 31.69,
+   "statScoreNow": 0.6,
+   "statScoreLong": 0.5
   },
   "7593": {
    "name": "Trey Sermon",
@@ -11280,9 +11560,9 @@
    "name": "Trey Lance",
    "pos": "QB",
    "age": 26.5,
-   "projPPG1": 7.52,
-   "projPPG3": 9.54,
-   "projPPG2": 8.93,
+   "projPPG1": 8.36,
+   "projPPG3": 10.25,
+   "projPPG2": 10.13,
    "survival": [
     0.975,
     0.943,
@@ -11295,26 +11575,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    8.46,
-    11.93,
-    14.54
+    10.07,
+    12.53,
+    15.21
    ],
    "expPPG": [
-    8.35,
-    11.59,
-    13.89
+    9.94,
+    12.17,
+    14.53
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.57,
-    "usage": 0.16,
-    "efficiency": -2.53,
-    "availability": -2.04,
-    "age": 0.28,
+    "recentProduction": -2.92,
+    "usage": 0.51,
+    "teamContext": -0.21,
+    "efficiency": -2.5,
+    "availability": -1.92,
+    "age": 0.19,
     "metrics": {
      "ppg": 3.385,
      "att_pg": 14.25,
+     "db_pg": 15.75,
      "rush_ppg": 2.125,
+     "car_pg": 4.25,
+     "rush_share": 0.155,
+     "team_att_pg": 33.471,
+     "team_epa_pp": -0.027,
+     "team_tds_pg": 2.118,
      "epa_db": -0.626,
      "cpoe": -9.782,
      "ypa": 3.965,
@@ -11323,7 +11610,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 21.39,
+   "longPPG": 23.26,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -13775,9 +14062,9 @@
    "name": "Kenny Pickett",
    "pos": "QB",
    "age": 28.4,
-   "projPPG1": 7.9,
-   "projPPG3": 8.59,
-   "projPPG2": 8.64,
+   "projPPG1": 7,
+   "projPPG3": 7.55,
+   "projPPG2": 7.45,
    "survival": [
     0.966,
     0.928,
@@ -13790,26 +14077,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    8.67,
-    11.58,
-    13.91
+    8.18,
+    11.11,
+    13.32
    ],
    "expPPG": [
-    8.53,
-    11.16,
-    13.11
+    8.05,
+    10.71,
+    12.56
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.53,
-    "usage": -0.21,
-    "efficiency": -2.01,
-    "availability": -1.59,
-    "age": 0.02,
+    "recentProduction": -2.84,
+    "usage": -0.98,
+    "teamContext": -1.07,
+    "efficiency": -1.81,
+    "availability": -1.49,
+    "age": -0.04,
     "metrics": {
      "ppg": 1.287,
      "att_pg": 7.5,
+     "db_pg": 8.833,
      "rush_ppg": 0.367,
+     "car_pg": 0.833,
+     "rush_share": 0.038,
+     "team_att_pg": 30.294,
+     "team_epa_pp": -0.216,
+     "team_tds_pg": 1.471,
      "epa_db": -0.543,
      "cpoe": -6.532,
      "ypa": 4.178,
@@ -13818,7 +14112,7 @@
     },
     "gamesLastSeason": 6
    },
-   "longPPG": 20.79,
+   "longPPG": 19.84,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -13826,9 +14120,9 @@
    "name": "Malik Willis",
    "pos": "QB",
    "age": 27.4,
-   "projPPG1": 16.54,
-   "projPPG3": 13.16,
-   "projPPG2": 14.42,
+   "projPPG1": 16.71,
+   "projPPG3": 12.83,
+   "projPPG2": 14.6,
    "survival": [
     0.968,
     0.935,
@@ -13841,26 +14135,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    18.87,
-    17.67,
-    15.58
+    18.45,
+    19.27,
+    16.21
    ],
    "expPPG": [
-    18.57,
-    17.1,
-    14.78
+    18.15,
+    18.64,
+    15.38
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.43,
-    "usage": 1.37,
-    "efficiency": 3.18,
-    "availability": -1.95,
-    "age": 0.15,
+    "recentProduction": -1.21,
+    "usage": 1.57,
+    "teamContext": -0.52,
+    "efficiency": 3.39,
+    "availability": -1.83,
+    "age": 0.08,
     "metrics": {
      "ppg": 12.795,
      "att_pg": 8.75,
+     "db_pg": 9.5,
      "rush_ppg": 6.075,
+     "car_pg": 5.5,
+     "rush_share": 0.19,
+     "team_att_pg": 28.765,
+     "team_epa_pp": 0.103,
+     "team_tds_pg": 2.588,
      "epa_db": 0.739,
      "cpoe": 21.985,
      "ypa": 12.057,
@@ -13869,9 +14170,9 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 32.7,
-   "statScoreNow": 7.9,
-   "statScoreLong": 2.2
+   "longPPG": 33.74,
+   "statScoreNow": 12.7,
+   "statScoreLong": 7
   },
   "8167": {
    "name": "Christian Watson",
@@ -14145,9 +14446,9 @@
    "name": "Brock Purdy",
    "pos": "QB",
    "age": 26.8,
-   "projPPG1": 16.94,
-   "projPPG3": 14.68,
-   "projPPG2": 15.63,
+   "projPPG1": 16.66,
+   "projPPG3": 14.64,
+   "projPPG2": 15.71,
    "survival": [
     0.971,
     0.939,
@@ -14160,26 +14461,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    17.89,
-    17.29,
+    17.53,
+    16.78,
     16.78
    ],
    "expPPG": [
-    17.63,
-    16.77,
-    15.98
+    17.28,
+    16.27,
+    15.99
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.02,
-    "usage": 0.26,
-    "efficiency": 0.71,
-    "availability": -0.51,
-    "age": 0.23,
+    "recentProduction": 0.83,
+    "usage": 0.14,
+    "teamContext": 0.17,
+    "efficiency": 0.61,
+    "availability": -0.46,
+    "age": 0.15,
     "metrics": {
      "ppg": 19.709,
      "att_pg": 31.556,
+     "db_pg": 32.778,
      "rush_ppg": 3.633,
+     "car_pg": 3.667,
+     "rush_share": 0.13,
+     "team_att_pg": 33.765,
+     "team_epa_pp": 0.082,
+     "team_tds_pg": 2.824,
      "epa_db": 0.214,
      "cpoe": 7.229,
      "ypa": 7.63,
@@ -14188,9 +14496,9 @@
     },
     "gamesLastSeason": 9
    },
-   "longPPG": 32.52,
-   "statScoreNow": 15.5,
-   "statScoreLong": 1.8
+   "longPPG": 31.95,
+   "statScoreNow": 11.7,
+   "statScoreLong": 0.7
   },
   "8188": {
    "name": "Tyquan Thornton",
@@ -15779,9 +16087,9 @@
    "name": "Bryce Young",
    "pos": "QB",
    "age": 25.2,
-   "projPPG1": 15.67,
-   "projPPG3": 14.82,
-   "projPPG2": 15.22,
+   "projPPG1": 14.84,
+   "projPPG3": 14.11,
+   "projPPG2": 14.29,
    "survival": [
     0.986,
     0.963,
@@ -15794,26 +16102,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    15.78,
-    16.11,
-    16.49
+    15.19,
+    15.3,
+    16.1
    ],
    "expPPG": [
-    15.67,
-    15.81,
-    15.93
+    15.08,
+    15.02,
+    15.55
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.42,
-    "usage": -0.13,
-    "efficiency": -0.32,
-    "availability": 0.89,
-    "age": 0.44,
+    "recentProduction": -0.34,
+    "usage": -0.11,
+    "teamContext": -0.71,
+    "efficiency": -0.41,
+    "availability": 0.83,
+    "age": 0.33,
     "metrics": {
      "ppg": 13.627,
      "att_pg": 29.875,
+     "db_pg": 31.563,
      "rush_ppg": 2.1,
+     "car_pg": 3.375,
+     "rush_share": 0.124,
+     "team_att_pg": 30.294,
+     "team_epa_pp": -0.046,
+     "team_tds_pg": 1.941,
      "epa_db": -0.044,
      "cpoe": 0.999,
      "ypa": 6.299,
@@ -15822,17 +16137,17 @@
     },
     "gamesLastSeason": 16
    },
-   "longPPG": 33.54,
-   "statScoreNow": 1.1,
-   "statScoreLong": 5.4
+   "longPPG": 32.28,
+   "statScoreNow": 0.1,
+   "statScoreLong": 1.2
   },
   "9230": {
    "name": "Tanner McKee",
    "pos": "QB",
    "age": 26.5,
-   "projPPG1": 9.21,
-   "projPPG3": 9.4,
-   "projPPG2": 9.43,
+   "projPPG1": 8.94,
+   "projPPG3": 9.69,
+   "projPPG2": 9.87,
    "survival": [
     0.974,
     0.943,
@@ -15845,26 +16160,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    10.7,
-    12.84,
-    14.01
+    11.01,
+    12.72,
+    14.15
    ],
    "expPPG": [
-    10.56,
-    12.47,
-    13.38
+    10.87,
+    12.36,
+    13.52
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.52,
-    "usage": -0.31,
-    "efficiency": -0.31,
-    "availability": -2.13,
-    "age": 0.27,
+    "recentProduction": -2.88,
+    "usage": -0.64,
+    "teamContext": -0.58,
+    "efficiency": -0.35,
+    "availability": -2.01,
+    "age": 0.19,
     "metrics": {
      "ppg": 3.44,
      "att_pg": 10.75,
+     "db_pg": 11.5,
      "rush_ppg": 0.2,
+     "car_pg": 2,
+     "rush_share": 0.071,
+     "team_att_pg": 29.235,
+     "team_epa_pp": 0.021,
+     "team_tds_pg": 2.529,
      "epa_db": -0.054,
      "cpoe": 1.359,
      "ypa": 6.372,
@@ -15873,7 +16195,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 23.23,
+   "longPPG": 23.46,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -17052,9 +17374,9 @@
    "name": "C.J. Stroud",
    "pos": "QB",
    "age": 25,
-   "projPPG1": 15.88,
-   "projPPG3": 14.87,
-   "projPPG2": 15.11,
+   "projPPG1": 15.65,
+   "projPPG3": 14.24,
+   "projPPG2": 14.65,
    "survival": [
     0.987,
     0.966,
@@ -17067,26 +17389,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    16.27,
-    16.01,
-    16.6
+    16.03,
+    16.11,
+    16.39
    ],
    "expPPG": [
-    16.16,
-    15.74,
-    16.06
+    15.92,
+    15.83,
+    15.87
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.42,
-    "usage": -0.19,
-    "efficiency": 0.18,
-    "availability": 0.61,
-    "age": 0.46,
+    "recentProduction": -0.36,
+    "usage": -0.15,
+    "teamContext": -0.14,
+    "efficiency": 0.13,
+    "availability": 0.59,
+    "age": 0.35,
     "metrics": {
      "ppg": 14.896,
      "att_pg": 30.214,
+     "db_pg": 31.857,
      "rush_ppg": 1.921,
+     "car_pg": 3.429,
+     "rush_share": 0.123,
+     "team_att_pg": 34.235,
+     "team_epa_pp": -0.013,
+     "team_tds_pg": 1.941,
      "epa_db": 0.107,
      "cpoe": 0.358,
      "ypa": 7.189,
@@ -17095,9 +17424,9 @@
     },
     "gamesLastSeason": 14
    },
-   "longPPG": 33.95,
-   "statScoreNow": 1.9,
-   "statScoreLong": 7.9
+   "longPPG": 33.71,
+   "statScoreNow": 1.4,
+   "statScoreLong": 6.7
   },
   "9997": {
    "name": "Zay Flowers",
@@ -19447,9 +19776,9 @@
    "name": "Joe Milton III",
    "pos": "QB",
    "age": 26.6,
-   "projPPG1": 9.45,
-   "projPPG3": 10.37,
-   "projPPG2": 10.35,
+   "projPPG1": 9.8,
+   "projPPG3": 10.6,
+   "projPPG2": 10.92,
    "survival": [
     0.973,
     0.941,
@@ -19462,26 +19791,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    11.4,
-    14.02,
-    14.31
+    12.09,
+    14.92,
+    14.7
    ],
    "expPPG": [
-    11.25,
-    13.61,
-    13.66
+    11.92,
+    14.48,
+    14.02
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -3.78,
-    "usage": 0.07,
-    "efficiency": -0.13,
-    "availability": -2.18,
-    "age": 0.25,
+    "recentProduction": -3.09,
+    "usage": -0.72,
+    "teamContext": 0.58,
+    "efficiency": -0.32,
+    "availability": -2.06,
+    "age": 0.17,
     "metrics": {
      "ppg": 2.58,
      "att_pg": 6,
+     "db_pg": 6,
      "rush_ppg": 1.25,
+     "car_pg": 1.25,
+     "rush_share": 0.046,
+     "team_att_pg": 36.706,
+     "team_epa_pp": 0.094,
+     "team_tds_pg": 2.882,
      "epa_db": 0.027,
      "cpoe": 1.605,
      "ypa": 7.625,
@@ -19490,7 +19826,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 24.61,
+   "longPPG": 25.86,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -19498,9 +19834,9 @@
    "name": "Michael Penix Jr.",
    "pos": "QB",
    "age": 26.5,
-   "projPPG1": 12.66,
-   "projPPG3": 12.98,
-   "projPPG2": 12.62,
+   "projPPG1": 12.05,
+   "projPPG3": 12.68,
+   "projPPG2": 12.44,
    "survival": [
     0.975,
     0.943,
@@ -19513,26 +19849,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    13.53,
-    14.65,
-    15.3
+    13.47,
+    13.84,
+    15.06
    ],
    "expPPG": [
-    13.36,
-    14.23,
-    14.62
+    13.3,
+    13.44,
+    14.39
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.32,
-    "usage": -0.34,
-    "efficiency": -0.22,
-    "availability": -0.97,
-    "age": 0.28,
+    "recentProduction": -1.12,
+    "usage": -0.66,
+    "teamContext": -0.37,
+    "efficiency": -0.28,
+    "availability": -0.91,
+    "age": 0.19,
     "metrics": {
      "ppg": 13.364,
      "att_pg": 30.667,
+     "db_pg": 32.111,
      "rush_ppg": 1.444,
+     "car_pg": 2.333,
+     "rush_share": 0.083,
+     "team_att_pg": 32.059,
+     "team_epa_pp": -0.014,
+     "team_tds_pg": 2.118,
      "epa_db": 0.018,
      "cpoe": -3.62,
      "ypa": 7.181,
@@ -19541,7 +19884,7 @@
     },
     "gamesLastSeason": 9
    },
-   "longPPG": 27.07,
+   "longPPG": 26.39,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -19549,9 +19892,9 @@
    "name": "Caleb Williams",
    "pos": "QB",
    "age": 24.9,
-   "projPPG1": 17.42,
-   "projPPG3": 16.95,
-   "projPPG2": 17.03,
+   "projPPG1": 17.4,
+   "projPPG3": 16.88,
+   "projPPG2": 16.9,
    "survival": [
     0.987,
     0.967,
@@ -19564,26 +19907,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    17.73,
-    17.54,
+    17.63,
+    17.18,
     17.5
    ],
    "expPPG": [
-    17.62,
-    17.25,
+    17.52,
+    16.9,
     16.96
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.42,
-    "usage": 0.15,
-    "efficiency": -0.07,
-    "availability": 1.22,
-    "age": 0.47,
+    "recentProduction": 0.31,
+    "usage": 0.37,
+    "teamContext": 0.14,
+    "efficiency": -0.17,
+    "availability": 1.16,
+    "age": 0.36,
     "metrics": {
      "ppg": 18.746,
      "att_pg": 33.412,
+     "db_pg": 34.824,
      "rush_ppg": 3.341,
+     "car_pg": 4.529,
+     "rush_share": 0.152,
+     "team_att_pg": 33.765,
+     "team_epa_pp": 0.073,
+     "team_tds_pg": 2.765,
      "epa_db": 0.071,
      "cpoe": -3.505,
      "ypa": 6.94,
@@ -19592,17 +19942,17 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 36.73,
-   "statScoreNow": 29.4,
-   "statScoreLong": 47.8
+   "longPPG": 36.41,
+   "statScoreNow": 32.3,
+   "statScoreLong": 47.9
   },
   "11562": {
    "name": "Spencer Rattler",
    "pos": "QB",
    "age": 26.1,
-   "projPPG1": 12.63,
-   "projPPG3": 12.01,
-   "projPPG2": 12.17,
+   "projPPG1": 12.72,
+   "projPPG3": 11.8,
+   "projPPG2": 12.3,
    "survival": [
     0.979,
     0.948,
@@ -19615,26 +19965,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    13.28,
-    14.25,
-    15.26
+    13.67,
+    14.62,
+    15.31
    ],
    "expPPG": [
-    13.13,
-    13.88,
-    14.62
+    13.53,
+    14.23,
+    14.67
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.49,
-    "usage": -0.18,
-    "efficiency": -0.37,
-    "availability": -0.87,
-    "age": 0.33,
+    "recentProduction": -1.23,
+    "usage": -0.04,
+    "teamContext": -0.23,
+    "efficiency": -0.42,
+    "availability": -0.82,
+    "age": 0.24,
     "metrics": {
      "ppg": 11.016,
      "att_pg": 28.556,
+     "db_pg": 30.556,
      "rush_ppg": 1.856,
+     "car_pg": 3.444,
+     "rush_share": 0.135,
+     "team_att_pg": 34.765,
+     "team_epa_pp": -0.069,
+     "team_tds_pg": 1.647,
      "epa_db": -0.078,
      "cpoe": 2.357,
      "ypa": 6.171,
@@ -19643,7 +20000,7 @@
     },
     "gamesLastSeason": 9
    },
-   "longPPG": 26.68,
+   "longPPG": 27.22,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -19651,9 +20008,9 @@
    "name": "Bo Nix",
    "pos": "QB",
    "age": 26.7,
-   "projPPG1": 17.93,
-   "projPPG3": 16.15,
-   "projPPG2": 17.03,
+   "projPPG1": 18.22,
+   "projPPG3": 16.32,
+   "projPPG2": 17.12,
    "survival": [
     0.973,
     0.941,
@@ -19666,26 +20023,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    18.27,
-    17.89,
-    17.27
+    18.28,
+    18.07,
+    17.58
    ],
    "expPPG": [
-    18.02,
-    17.36,
-    16.47
+    18.03,
+    17.54,
+    16.77
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.95,
-    "usage": 0.24,
-    "efficiency": 0.03,
-    "availability": 1.22,
-    "age": 0.25,
+    "recentProduction": 0.78,
+    "usage": 0.67,
+    "teamContext": 0.34,
+    "efficiency": -0.13,
+    "availability": 1.16,
+    "age": 0.17,
     "metrics": {
      "ppg": 17.932,
      "att_pg": 36,
+     "db_pg": 37.294,
      "rush_ppg": 3.859,
+     "car_pg": 4.882,
+     "rush_share": 0.182,
+     "team_att_pg": 36.059,
+     "team_epa_pp": 0.045,
+     "team_tds_pg": 2.529,
      "epa_db": 0.1,
      "cpoe": -1.196,
      "ypa": 6.423,
@@ -19694,17 +20058,17 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 36.82,
-   "statScoreNow": 48.5,
-   "statScoreLong": 49.3
+   "longPPG": 37.14,
+   "statScoreNow": 63.8,
+   "statScoreLong": 63.2
   },
   "11564": {
    "name": "Drake Maye",
    "pos": "QB",
    "age": 24.1,
-   "projPPG1": 19,
-   "projPPG3": 17.36,
-   "projPPG2": 17.64,
+   "projPPG1": 19.32,
+   "projPPG3": 17.56,
+   "projPPG2": 18.01,
    "survival": [
     0.99,
     0.976,
@@ -19717,26 +20081,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    19.37,
-    18.14,
-    17.08
+    19.44,
+    18.44,
+    17.39
    ],
    "expPPG": [
-    19.27,
-    17.93,
-    16.7
+    19.34,
+    18.22,
+    17
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.44,
-    "usage": 0.43,
-    "efficiency": 1.32,
-    "availability": 1.04,
-    "age": 0.54,
+    "recentProduction": 0.3,
+    "usage": 1.17,
+    "teamContext": -0.22,
+    "efficiency": 1.45,
+    "availability": 0.98,
+    "age": 0.42,
     "metrics": {
      "ppg": 20.704,
      "att_pg": 28.941,
+     "db_pg": 31.706,
      "rush_ppg": 4.059,
+     "car_pg": 6.059,
+     "rush_share": 0.209,
+     "team_att_pg": 29.529,
+     "team_epa_pp": 0.143,
+     "team_tds_pg": 3.118,
      "epa_db": 0.308,
      "cpoe": 10.781,
      "ypa": 8.931,
@@ -19745,17 +20116,17 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 38.34,
-   "statScoreNow": 84.7,
-   "statScoreLong": 76.5
+   "longPPG": 38.8,
+   "statScoreNow": 92.5,
+   "statScoreLong": 88.9
   },
   "11565": {
    "name": "J.J. McCarthy",
    "pos": "QB",
    "age": 23.8,
-   "projPPG1": 13.71,
-   "projPPG3": 14.4,
-   "projPPG2": 14.28,
+   "projPPG1": 12.82,
+   "projPPG3": 13.44,
+   "projPPG2": 12.97,
    "survival": [
     0.99,
     0.978,
@@ -19768,26 +20139,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    14.28,
-    16.07,
-    16.75
+    13.67,
+    14.91,
+    16.23
    ],
    "expPPG": [
-    14.21,
-    15.89,
-    16.42
+    13.6,
+    14.75,
+    15.91
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.79,
-    "usage": 0.56,
-    "efficiency": -0.86,
-    "availability": -0.99,
-    "age": 0.57,
+    "recentProduction": -0.65,
+    "usage": 0.52,
+    "teamContext": -1.04,
+    "efficiency": -0.72,
+    "availability": -0.95,
+    "age": 0.45,
     "metrics": {
      "ppg": 12.538,
      "att_pg": 24.3,
+     "db_pg": 27,
      "rush_ppg": 4.21,
+     "car_pg": 3.7,
+     "rush_share": 0.153,
+     "team_att_pg": 28.471,
+     "team_epa_pp": -0.12,
+     "team_tds_pg": 1.941,
      "epa_db": -0.2,
      "cpoe": -5.724,
      "ypa": 6.716,
@@ -19796,17 +20174,17 @@
     },
     "gamesLastSeason": 10
    },
-   "longPPG": 32.76,
+   "longPPG": 31.15,
    "statScoreNow": 0,
-   "statScoreLong": 2.3
+   "statScoreLong": 0.2
   },
   "11566": {
    "name": "Jayden Daniels",
    "pos": "QB",
    "age": 25.8,
-   "projPPG1": 16.56,
-   "projPPG3": 14.48,
-   "projPPG2": 15.7,
+   "projPPG1": 16.96,
+   "projPPG3": 14.85,
+   "projPPG2": 16.05,
    "survival": [
     0.981,
     0.952,
@@ -19819,26 +20197,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    17.39,
-    17.36,
-    17.99
+    17.7,
+    17.57,
+    18.77
    ],
    "expPPG": [
-    17.22,
-    16.94,
-    17.28
+    17.52,
+    17.14,
+    18.03
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 1.13,
-    "usage": 0.92,
-    "efficiency": -0.25,
-    "availability": -0.83,
-    "age": 0.36,
+    "recentProduction": 0.96,
+    "usage": 2.37,
+    "teamContext": -0.89,
+    "efficiency": -0.19,
+    "availability": -0.76,
+    "age": 0.26,
     "metrics": {
      "ppg": 16.326,
      "att_pg": 26.857,
+     "db_pg": 29.429,
      "rush_ppg": 5.686,
+     "car_pg": 8.286,
+     "rush_share": 0.291,
+     "team_att_pg": 27.588,
+     "team_epa_pp": -0.001,
+     "team_tds_pg": 2.294,
      "epa_db": -0.023,
      "cpoe": -2.729,
      "ypa": 6.713,
@@ -19847,9 +20232,9 @@
     },
     "gamesLastSeason": 7
    },
-   "longPPG": 33.09,
-   "statScoreNow": 8.2,
-   "statScoreLong": 3.4
+   "longPPG": 33.86,
+   "statScoreNow": 18.6,
+   "statScoreLong": 7.9
   },
   "11570": {
    "name": "Rasheen Ali",
@@ -23094,9 +23479,9 @@
    "name": "Riley Leonard",
    "pos": "QB",
    "age": 24.1,
-   "projPPG1": 10.69,
-   "projPPG3": 11.86,
-   "projPPG2": 11.73,
+   "projPPG1": 10.02,
+   "projPPG3": 11.94,
+   "projPPG2": 11.66,
    "survival": [
     0.99,
     0.977,
@@ -23109,26 +23494,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    12.27,
-    14.89,
-    15.87
+    12.06,
+    13.67,
+    15.49
    ],
    "expPPG": [
-    12.2,
-    14.71,
-    15.52
+    12,
+    13.51,
+    15.15
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.7,
-    "usage": 0.4,
-    "efficiency": -0.77,
-    "availability": -2.01,
-    "age": 0.54,
+    "recentProduction": -2.2,
+    "usage": -0.61,
+    "teamContext": 0.02,
+    "efficiency": -0.92,
+    "availability": -1.91,
+    "age": 0.43,
     "metrics": {
      "ppg": 6.2,
      "att_pg": 13.4,
+     "db_pg": 13.8,
      "rush_ppg": 2.94,
+     "car_pg": 1.2,
+     "rush_share": 0.046,
+     "team_att_pg": 32.176,
+     "team_epa_pp": 0.08,
+     "team_tds_pg": 3.059,
      "epa_db": -0.119,
      "cpoe": -3.871,
      "ypa": 6.194,
@@ -23137,7 +23529,7 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 27.07,
+   "longPPG": 25.94,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -23674,9 +24066,9 @@
    "name": "Dillon Gabriel",
    "pos": "QB",
    "age": 25.8,
-   "projPPG1": 10.77,
-   "projPPG3": 11.64,
-   "projPPG2": 11.44,
+   "projPPG1": 9.9,
+   "projPPG3": 10.4,
+   "projPPG2": 9.99,
    "survival": [
     0.981,
     0.952,
@@ -23689,26 +24081,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    11.58,
-    13.96,
-    15.05
+    10.83,
+    13.34,
+    14.37
    ],
    "expPPG": [
-    11.46,
-    13.63,
-    14.46
+    10.73,
+    13.02,
+    13.8
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.45,
-    "usage": -0.27,
-    "efficiency": -1.09,
-    "availability": -0.99,
-    "age": 0.36,
+    "recentProduction": -2,
+    "usage": -0.88,
+    "teamContext": -0.67,
+    "efficiency": -1.08,
+    "availability": -0.95,
+    "age": 0.26,
     "metrics": {
      "ppg": 7.008,
      "att_pg": 18.5,
+     "db_pg": 20.4,
      "rush_ppg": 0.86,
+     "car_pg": 1.4,
+     "rush_share": 0.057,
+     "team_att_pg": 32.824,
+     "team_epa_pp": -0.181,
+     "team_tds_pg": 1.529,
      "epa_db": -0.22,
      "cpoe": -7.507,
      "ypa": 5.065,
@@ -23717,7 +24116,7 @@
     },
     "gamesLastSeason": 10
    },
-   "longPPG": 27.77,
+   "longPPG": 26.35,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -24308,9 +24707,9 @@
    "name": "Quinn Ewers",
    "pos": "QB",
    "age": 23.4,
-   "projPPG1": 11.01,
-   "projPPG3": 11.18,
-   "projPPG2": 10.99,
+   "projPPG1": 10.33,
+   "projPPG3": 10.94,
+   "projPPG2": 10.9,
    "survival": [
     0.99,
     0.979,
@@ -24323,26 +24722,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    11.93,
-    13.46,
-    15.12
+    11.95,
+    12.67,
+    14.74
    ],
    "expPPG": [
-    11.88,
-    13.32,
-    14.85
+    11.89,
+    12.54,
+    14.48
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.07,
-    "usage": -0.43,
-    "efficiency": -0.1,
-    "availability": -2.22,
-    "age": 0.6,
+    "recentProduction": -1.69,
+    "usage": -0.72,
+    "teamContext": -0.86,
+    "efficiency": 0.01,
+    "availability": -2.1,
+    "age": 0.48,
     "metrics": {
      "ppg": 8.295,
      "att_pg": 20.75,
+     "db_pg": 22.75,
      "rush_ppg": 0.475,
+     "car_pg": 2,
+     "rush_share": 0.079,
+     "team_att_pg": 28.176,
+     "team_epa_pp": -0.008,
+     "team_tds_pg": 2.176,
      "epa_db": -0.025,
      "cpoe": 0.992,
      "ypa": 7.494,
@@ -24351,7 +24757,7 @@
     },
     "gamesLastSeason": 4
    },
-   "longPPG": 25.56,
+   "longPPG": 24.85,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -24677,9 +25083,9 @@
    "name": "Jaxson Dart",
    "pos": "QB",
    "age": 23.4,
-   "projPPG1": 17.65,
-   "projPPG3": 16.98,
-   "projPPG2": 17.67,
+   "projPPG1": 17.34,
+   "projPPG3": 16.33,
+   "projPPG2": 16.7,
    "survival": [
     0.99,
     0.979,
@@ -24692,26 +25098,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    18.46,
-    19.37,
-    18.23
+    17.6,
+    18.72,
+    18.09
    ],
    "expPPG": [
-    18.37,
-    19.17,
-    17.9
+    17.52,
+    18.53,
+    17.76
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": 0.62,
-    "usage": 1.44,
-    "efficiency": -0.06,
-    "availability": -0.16,
-    "age": 0.6,
+    "recentProduction": 0.51,
+    "usage": 1.67,
+    "teamContext": -0.37,
+    "efficiency": 0.02,
+    "availability": -0.18,
+    "age": 0.48,
     "metrics": {
      "ppg": 17.256,
      "att_pg": 24.214,
+     "db_pg": 26.714,
      "rush_ppg": 7.336,
+     "car_pg": 6.143,
+     "rush_share": 0.204,
+     "team_att_pg": 30.941,
+     "team_epa_pp": 0.02,
+     "team_tds_pg": 2.529,
      "epa_db": 0.009,
      "cpoe": -0.193,
      "ypa": 6.702,
@@ -24720,9 +25133,9 @@
     },
     "gamesLastSeason": 14
    },
-   "longPPG": 39.27,
-   "statScoreNow": 37.7,
-   "statScoreLong": 88.1
+   "longPPG": 38.06,
+   "statScoreNow": 30.2,
+   "statScoreLong": 79.6
   },
   "12509": {
    "name": "Tre Harris",
@@ -24782,9 +25195,9 @@
    "name": "Jalen Milroe",
    "pos": "QB",
    "age": 23.9,
-   "projPPG1": 8.5,
-   "projPPG3": 9.51,
-   "projPPG2": 9.13,
+   "projPPG1": 7.95,
+   "projPPG3": 9.25,
+   "projPPG2": 9,
    "survival": [
     0.99,
     0.978,
@@ -24797,26 +25210,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    10.41,
+    10.24,
     12.88,
-    14.3
+    14.11
    ],
    "expPPG": [
-    10.36,
-    12.74,
-    14
+    10.19,
+    12.73,
+    13.81
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.72,
-    "usage": -0.13,
+    "recentProduction": -3.85,
+    "usage": -0.89,
+    "teamContext": -0.68,
     "efficiency": 0,
-    "availability": -2.43,
-    "age": 0.56,
+    "availability": -2.3,
+    "age": 0.45,
     "metrics": {
      "ppg": -0.533,
      "att_pg": 0,
+     "db_pg": 0,
      "rush_ppg": 0.133,
+     "car_pg": 1,
+     "rush_share": 0.034,
+     "team_att_pg": 28.294,
+     "team_epa_pp": 0.031,
+     "team_tds_pg": 2.588,
      "epa_db": null,
      "cpoe": null,
      "ypa": null,
@@ -24825,7 +25245,7 @@
     },
     "gamesLastSeason": 3
    },
-   "longPPG": 23.61,
+   "longPPG": 23.38,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -25204,9 +25624,9 @@
    "name": "Cam Ward",
    "pos": "QB",
    "age": 24.4,
-   "projPPG1": 13.82,
-   "projPPG3": 14.15,
-   "projPPG2": 14,
+   "projPPG1": 13.13,
+   "projPPG3": 13.13,
+   "projPPG2": 12.7,
    "survival": [
     0.989,
     0.973,
@@ -25219,26 +25639,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    13.67,
-    15.16,
-    15.71
+    13.22,
+    14.55,
+    15.01
    ],
    "expPPG": [
-    13.6,
-    14.96,
-    15.31
+    13.14,
+    14.36,
+    14.63
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.26,
-    "usage": -0.3,
-    "efficiency": -0.8,
-    "availability": 0.45,
-    "age": 0.51,
+    "recentProduction": -1.03,
+    "usage": -0.53,
+    "teamContext": -0.57,
+    "efficiency": -0.75,
+    "availability": 0.39,
+    "age": 0.4,
     "metrics": {
      "ppg": 10.98,
      "att_pg": 31.765,
+     "db_pg": 35,
      "rush_ppg": 1.641,
+     "car_pg": 2.294,
+     "rush_share": 0.103,
+     "team_att_pg": 33.529,
+     "team_epa_pp": -0.158,
+     "team_tds_pg": 1.412,
      "epa_db": -0.183,
      "cpoe": -2.93,
      "ypa": 5.869,
@@ -25247,9 +25674,9 @@
     },
     "gamesLastSeason": 17
    },
-   "longPPG": 30.92,
+   "longPPG": 29.71,
    "statScoreNow": 0,
-   "statScoreLong": 0.2
+   "statScoreLong": 0
   },
   "12523": {
    "name": "Jimmy Horn Jr.",
@@ -25309,9 +25736,9 @@
    "name": "Shedeur Sanders",
    "pos": "QB",
    "age": 24.7,
-   "projPPG1": 12.06,
-   "projPPG3": 12.77,
-   "projPPG2": 12.52,
+   "projPPG1": 11.38,
+   "projPPG3": 11.81,
+   "projPPG2": 11.37,
    "survival": [
     0.988,
     0.97,
@@ -25324,26 +25751,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    12.54,
-    14.5,
-    15.88
+    12.29,
+    13.75,
+    15.25
    ],
    "expPPG": [
-    12.46,
-    14.28,
-    15.43
+    12.21,
+    13.55,
+    14.81
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -1.37,
-    "usage": 0.14,
-    "efficiency": -1.02,
-    "availability": -1.4,
-    "age": 0.49,
+    "recentProduction": -1.12,
+    "usage": -0.2,
+    "teamContext": -0.67,
+    "efficiency": -0.89,
+    "availability": -1.34,
+    "age": 0.38,
     "metrics": {
      "ppg": 10.613,
      "att_pg": 26.5,
+     "db_pg": 29.375,
      "rush_ppg": 2.863,
+     "car_pg": 2.625,
+     "rush_share": 0.106,
+     "team_att_pg": 32.824,
+     "team_epa_pp": -0.181,
+     "team_tds_pg": 1.529,
      "epa_db": -0.252,
      "cpoe": -5,
      "ypa": 6.604,
@@ -25352,7 +25786,7 @@
     },
     "gamesLastSeason": 8
    },
-   "longPPG": 26.93,
+   "longPPG": 25.92,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -25782,9 +26216,9 @@
    "name": "Brady Cook",
    "pos": "QB",
    "age": 25,
-   "projPPG1": 8.66,
-   "projPPG3": 9.71,
-   "projPPG2": 9.06,
+   "projPPG1": 8.03,
+   "projPPG3": 10.05,
+   "projPPG2": 9.34,
    "survival": [
     0.987,
     0.966,
@@ -25797,26 +26231,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    9.09,
-    11.54,
-    14.7
+    9.63,
+    10.09,
+    14.27
    ],
    "expPPG": [
-    9.03,
-    11.34,
-    14.23
+    9.56,
+    9.92,
+    13.81
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -2.85,
-    "usage": -0.47,
-    "efficiency": -1.7,
-    "availability": -2.01,
-    "age": 0.46,
+    "recentProduction": -2.33,
+    "usage": -0.61,
+    "teamContext": -1.1,
+    "efficiency": -1.61,
+    "availability": -1.91,
+    "age": 0.35,
     "metrics": {
      "ppg": 5.692,
      "att_pg": 30.6,
+     "db_pg": 34.4,
      "rush_ppg": 0.98,
+     "car_pg": 2.6,
+     "rush_share": 0.097,
+     "team_att_pg": 29.059,
+     "team_epa_pp": -0.13,
+     "team_tds_pg": 1.529,
      "epa_db": -0.397,
      "cpoe": -10.029,
      "ypa": 4.83,
@@ -25825,7 +26266,7 @@
     },
     "gamesLastSeason": 5
    },
-   "longPPG": 21.91,
+   "longPPG": 21.13,
    "statScoreNow": 0,
    "statScoreLong": 0
   },
@@ -26153,9 +26594,9 @@
    "name": "Tyler Shough",
    "pos": "QB",
    "age": 27.1,
-   "projPPG1": 14.6,
-   "projPPG3": 13.65,
-   "projPPG2": 14.16,
+   "projPPG1": 14.65,
+   "projPPG3": 13.06,
+   "projPPG2": 13.76,
    "survival": [
     0.968,
     0.937,
@@ -26168,26 +26609,33 @@
    ],
    "availability": 0.784,
    "projPPGNoCliff": [
-    15.21,
-    16.18,
-    15.67
+    15.22,
+    16.6,
+    15.77
    ],
    "expPPG": [
-    14.97,
-    15.67,
-    14.9
+    14.98,
+    16.07,
+    15
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -0.24,
-    "usage": 0.21,
-    "efficiency": 0,
-    "availability": -0.78,
-    "age": 0.19,
+    "recentProduction": -0.2,
+    "usage": 0.4,
+    "teamContext": -0.23,
+    "efficiency": 0.09,
+    "availability": -0.76,
+    "age": 0.12,
     "metrics": {
      "ppg": 14.36,
      "att_pg": 29.727,
+     "db_pg": 32.545,
      "rush_ppg": 3.327,
+     "car_pg": 4.091,
+     "rush_share": 0.16,
+     "team_att_pg": 34.765,
+     "team_epa_pp": -0.069,
+     "team_tds_pg": 1.647,
      "epa_db": 0.006,
      "cpoe": 1.608,
      "ypa": 7.291,
@@ -26196,9 +26644,9 @@
     },
     "gamesLastSeason": 11
    },
-   "longPPG": 32.24,
-   "statScoreNow": 0,
-   "statScoreLong": 1.2
+   "longPPG": 32.59,
+   "statScoreNow": 0.1,
+   "statScoreLong": 1.8
   },
   "12547": {
    "name": "Kyle Williams",
@@ -26632,9 +27080,9 @@
    "name": "Max Brosmer",
    "pos": "QB",
    "age": 25.6,
-   "projPPG1": 7.06,
-   "projPPG3": 8.96,
-   "projPPG2": 8.17,
+   "projPPG1": 6.41,
+   "projPPG3": 8.75,
+   "projPPG2": 7.92,
    "survival": [
     0.983,
     0.957,
@@ -26647,26 +27095,33 @@
    ],
    "availability": 0.712,
    "projPPGNoCliff": [
-    7.3,
-    10.64,
-    13.5
+    7.68,
+    9.75,
+    12.95
    ],
    "expPPG": [
-    7.24,
-    10.41,
-    13
+    7.62,
+    9.54,
+    12.47
    ],
    "components": {
     "baseline": 15.23,
-    "recentProduction": -4.38,
-    "usage": -0.32,
-    "efficiency": -2.25,
-    "availability": -1.6,
-    "age": 0.39,
+    "recentProduction": -3.57,
+    "usage": -1.02,
+    "teamContext": -1.04,
+    "efficiency": -1.95,
+    "availability": -1.53,
+    "age": 0.29,
     "metrics": {
      "ppg": 0.603,
      "att_pg": 10.143,
+     "db_pg": 12.143,
      "rush_ppg": 0.157,
+     "car_pg": 1,
+     "rush_share": 0.041,
+     "team_att_pg": 28.471,
+     "team_epa_pp": -0.12,
+     "team_tds_pg": 1.941,
      "epa_db": -0.665,
      "cpoe": -3.528,
      "ypa": 4.62,
@@ -26675,7 +27130,7 @@
     },
     "gamesLastSeason": 7
    },
-   "longPPG": 19.32,
+   "longPPG": 18.73,
    "statScoreNow": 0,
    "statScoreLong": 0
   },

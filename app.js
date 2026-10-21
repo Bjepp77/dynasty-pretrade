@@ -7,12 +7,12 @@ async function j(u) { const r = await fetch(u); if (!r.ok) throw new Error(u + "
 const cget = (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
 const cset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
-let VALUES = null, STATS = null, PLAYERS = null;
+let VALUES = null, STATS = null, PLAYERS = null, SOS = null;
 async function load() {
   const day = new Date().toISOString().slice(0, 10), bkey = "dpt_base_v4_" + day;
   try { Object.keys(localStorage).forEach((k) => { if (k.startsWith("dpt_") && k !== "dpt_settings" && k !== "dpt_league" && !k.includes(day)) localStorage.removeItem(k); }); } catch (e) {}
   // values.json (aggregate market) and stats.json (stats model) are snapshots built by scripts/
-  if (!VALUES) [VALUES, STATS] = await Promise.all([j("data/values.json"), j("data/stats.json")]);
+  if (!VALUES) [VALUES, STATS, SOS] = await Promise.all([j("data/values.json"), j("data/stats.json"), j("data/sos.json").catch(() => null)]);
   // Sleeper players: live team, injury and depth chart (slimmed before caching; full file is ~14MB)
   let players = cget(bkey);
   if (!players) {
@@ -53,12 +53,24 @@ const bar = (label, v, w) => `<div class="bar"><span>${label}</span><div class="
 const trendTxt = (t) => (t == null ? "" : `<span class="${t >= 0 ? "up" : "down"}">${t >= 0 ? "▲" : "▼"} ${Math.abs(t).toFixed(1)}%</span>`);
 const hintTag = (r) => (r.trendHint ? `<span class="tag ${r.trend > 0 ? "rising" : "falling"}">${r.trendHint}</span>` : "");
 
+// Remaining-schedule strength from data/sos.json (scripts/fit-sos.mjs). Display only: it is not part of any score.
+const SOS_TEAM = { LAR: "LA" }; // Sleeper -> nflverse abbreviations
+function sosLine(p) {
+  const t = SOS && SOS.schedule[SOS_TEAM[p.team] || p.team];
+  if (!t || p.isPick || !t.ros[p.pos]) return "";
+  const n = Object.keys(SOS.schedule).length, ix = t.ros[p.pos], word = ix >= 1.01 ? "easier" : ix <= 0.99 ? "harder" : "about average";
+  const po = t.playoffs[p.pos] != null ? `, fantasy playoffs (wk ${SOS.meta.fantasyPlayoffWeeks[0]}-${SOS.meta.fantasyPlayoffWeeks.slice(-1)[0]}) ${t.playoffs[p.pos].toFixed(2)}` : "";
+  return `<div class="meta">Schedule, rest of ${SOS.meta.season}: ${word} for ${p.pos}s (index ${ix.toFixed(2)}, rank ${t.rank[p.pos]}/${n}, 1 = easiest${po}). Weak signal: not scored.</div>`;
+}
+
 function card(r) {
   const p = r.p, st = p.st, o = r.overall;
   const big = DPT.TYPES.map((k) => `<div><small>${k}</small><b>${Math.round(o[k])}</b></div>`).join("");
   const src = { fc: "FantasyCalc", dd: "Dynasty Daddy", dp: "DynastyProcess", adp: "Sleeper ADP" };
   const srcBars = Object.entries(p.by).map(([k, v]) => bar(src[k] || k, v)).join("");
-  const statsCol = r.hasStats ? `<h4>Stats model</h4>${bar("Now", r.now, 1)}${bar("Long-term", r.long, 1)}
+  const h1 = DB.statsMeta && DB.statsMeta.holdout && DB.statsMeta.holdout[p.pos] && DB.statsMeta.holdout[p.pos].h1.holdout;
+  const conf = r.lowConf ? `<span class="tag lowconf" title="${p.pos} stats model: 2025 holdout R² ${h1 ? h1.r2 : "?"} (bar ${DB.statsMeta.lowConfidenceR2}). Lean on the market score.">Low confidence</span>` : "";
+  const statsCol = r.hasStats ? `<h4>Stats model ${conf}</h4>${bar("Now", r.now, 1)}${bar("Long-term", r.long, 1)}
     <div class="meta">Projected PPG: ${st.projPPG1.toFixed(1)} / ${st.projPPG2.toFixed(1)} / ${st.projPPG3.toFixed(1)} (next 3 seasons).<br>
     Chance still a regular: ${st.survival.map((x) => Math.round(100 * x) + "%").join(" / ")}.<br>Last season ${st.components.metrics.ppg.toFixed(1)} PPG in ${st.components.gamesLastSeason} games.</div>`
     : `<h4>Stats model</h4><p class="meta">No NFL stats yet (rookie or no recent games). Overall = market score only.</p>`;
@@ -67,7 +79,7 @@ function card(r) {
   <h4>Overall score by team type (0-100)</h4><div class="verdict">${big}</div>
   <p class="exp">${r.explanation}</p>
   <div class="pair"><div><h4>Market ${Math.round(p.market)} <small>(${p.n} sources${p.spread != null ? ", spread " + p.spread.toFixed(1) : ""})</small></h4>${srcBars}
-  <div class="meta">30-day trend: ${p.trend == null ? "n/a" : trendTxt(p.trend)}</div></div>
+  <div class="meta">30-day trend: ${p.trend == null ? "n/a" : trendTxt(p.trend)}</div>${sosLine(p)}</div>
   <div>${statsCol}</div></div></div>`;
 }
 
@@ -82,7 +94,7 @@ function renderTrade() {
   if (!sideA.length || !sideB.length) { $("#tout").innerHTML = "<p class='meta'>Add at least one player to each side.</p>"; return; }
   const t = DPT.analyzeTrade(DB, sideA, sideB);
   const w = (v) => (v.winner === "Even" ? "Fair" : `Side ${v.winner}: ${v.band}`);
-  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} ${trendTxt(r.trend)} ${r.trendHint ? `<small>${r.trendHint}</small>` : ""}<br><small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge ${r.archetype}" style="font-size:11px">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
+  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} ${trendTxt(r.trend)} ${r.trendHint ? `<small>${r.trendHint}</small>` : ""}${r.lowConf ? ' <small class="lowconf">low-confidence stats</small>' : ""}<br><small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge ${r.archetype}" style="font-size:11px">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
   const n0 = (x) => Math.round(x).toLocaleString();
   const trow = (label, a, b) => `<tr><td>${label}</td><td>${n0(a)}</td><td>${n0(b)}</td></tr>`;
   const vk = (k) => `<div><small>Better for a ${k}</small><b>${w(t.verdict[k])}</b><small>${(100 * t.verdict[k].pct).toFixed(1)}% gap</small></div>`;

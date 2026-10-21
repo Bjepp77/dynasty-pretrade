@@ -1,0 +1,2118 @@
+{
+ "meta": {
+  "generated": "2026-10-21T22:47:18.879Z",
+  "season": 2026,
+  "weeksPlayed": 6,
+  "scoring": "PPR",
+  "fantasyPlayoffWeeks": [
+   15,
+   16,
+   17
+  ],
+  "source": "nflverse stats_player_week (prior + current season), nflverse/nfldata games.csv (schedule)",
+  "method": "Defense index = PPR points allowed per game to the position / league average (1.00 = average, >1 = easier). Blend: idx = 1 + shrink*(w*toDate + (1-w)*prior - 1), w = games/(games+K). SOS = mean index of remaining opponents.",
+  "validation": {
+   "pairs": [
+    "2023->2024",
+    "2024->2025"
+   ],
+   "splitWeek": 6,
+   "chosen": {
+    "K": 4,
+    "shrink": 0.3
+   },
+   "byPos": {
+    "QB": {
+     "n": 64,
+     "corrPriorOnly": -0.002,
+     "corrToDateOnly": 0.251,
+     "corrBlend": 0.215,
+     "rmseBlend": 0.163,
+     "rmseAverage": 0.166
+    },
+    "RB": {
+     "n": 64,
+     "corrPriorOnly": 0.224,
+     "corrToDateOnly": 0.191,
+     "corrBlend": 0.26,
+     "rmseBlend": 0.153,
+     "rmseAverage": 0.159
+    },
+    "WR": {
+     "n": 64,
+     "corrPriorOnly": -0.186,
+     "corrToDateOnly": 0.202,
+     "corrBlend": 0.092,
+     "rmseBlend": 0.125,
+     "rmseAverage": 0.124
+    },
+    "TE": {
+     "n": 64,
+     "corrPriorOnly": 0.188,
+     "corrToDateOnly": 0.228,
+     "corrBlend": 0.272,
+     "rmseBlend": 0.211,
+     "rmseAverage": 0.219
+    }
+   }
+  }
+ },
+ "defense": {
+  "NYJ": {
+   "QB": {
+    "idx": 1.007,
+    "priorIdx": 1.224,
+    "toDateIdx": 0.888,
+    "toDateGames": 6,
+    "toDatePPG": 14.9
+   },
+   "RB": {
+    "idx": 1.038,
+    "priorIdx": 1.274,
+    "toDateIdx": 1.029,
+    "toDateGames": 6,
+    "toDatePPG": 21.9
+   },
+   "WR": {
+    "idx": 0.99,
+    "priorIdx": 0.986,
+    "toDateIdx": 0.956,
+    "toDateGames": 6,
+    "toDatePPG": 30.8
+   },
+   "TE": {
+    "idx": 0.961,
+    "priorIdx": 1.145,
+    "toDateIdx": 0.685,
+    "toDateGames": 6,
+    "toDatePPG": 9.5
+   }
+  },
+  "CIN": {
+   "QB": {
+    "idx": 1.016,
+    "priorIdx": 1.13,
+    "toDateIdx": 0.99,
+    "toDateGames": 5,
+    "toDatePPG": 16.7
+   },
+   "RB": {
+    "idx": 1.017,
+    "priorIdx": 1.289,
+    "toDateIdx": 0.873,
+    "toDateGames": 5,
+    "toDatePPG": 18.6
+   },
+   "WR": {
+    "idx": 0.961,
+    "priorIdx": 0.822,
+    "toDateIdx": 0.908,
+    "toDateGames": 5,
+    "toDatePPG": 29.3
+   },
+   "TE": {
+    "idx": 1.109,
+    "priorIdx": 1.569,
+    "toDateIdx": 1.196,
+    "toDateGames": 5,
+    "toDatePPG": 16.6
+   }
+  },
+  "HOU": {
+   "QB": {
+    "idx": 0.991,
+    "priorIdx": 0.786,
+    "toDateIdx": 1.091,
+    "toDateGames": 6,
+    "toDatePPG": 18.4
+   },
+   "RB": {
+    "idx": 0.971,
+    "priorIdx": 0.909,
+    "toDateIdx": 0.898,
+    "toDateGames": 6,
+    "toDatePPG": 19.1
+   },
+   "WR": {
+    "idx": 1.014,
+    "priorIdx": 0.843,
+    "toDateIdx": 1.182,
+    "toDateGames": 6,
+    "toDatePPG": 38.1
+   },
+   "TE": {
+    "idx": 0.947,
+    "priorIdx": 0.923,
+    "toDateIdx": 0.758,
+    "toDateGames": 6,
+    "toDatePPG": 10.6
+   }
+  },
+  "WAS": {
+   "QB": {
+    "idx": 1.082,
+    "priorIdx": 1.2,
+    "toDateIdx": 1.321,
+    "toDateGames": 6,
+    "toDatePPG": 22.2
+   },
+   "RB": {
+    "idx": 1,
+    "priorIdx": 1.159,
+    "toDateIdx": 0.894,
+    "toDateGames": 6,
+    "toDatePPG": 19
+   },
+   "WR": {
+    "idx": 1.037,
+    "priorIdx": 1.134,
+    "toDateIdx": 1.115,
+    "toDateGames": 6,
+    "toDatePPG": 35.9
+   },
+   "TE": {
+    "idx": 1.122,
+    "priorIdx": 1.195,
+    "toDateIdx": 1.546,
+    "toDateGames": 6,
+    "toDatePPG": 21.5
+   }
+  },
+  "CHI": {
+   "QB": {
+    "idx": 1.025,
+    "priorIdx": 1.112,
+    "toDateIdx": 1.067,
+    "toDateGames": 6,
+    "toDatePPG": 18
+   },
+   "RB": {
+    "idx": 0.959,
+    "priorIdx": 0.964,
+    "toDateIdx": 0.798,
+    "toDateGames": 6,
+    "toDatePPG": 17
+   },
+   "WR": {
+    "idx": 1.022,
+    "priorIdx": 1.176,
+    "toDateIdx": 1.007,
+    "toDateGames": 6,
+    "toDatePPG": 32.5
+   },
+   "TE": {
+    "idx": 0.954,
+    "priorIdx": 0.982,
+    "toDateIdx": 0.756,
+    "toDateGames": 6,
+    "toDatePPG": 10.5
+   }
+  },
+  "NYG": {
+   "QB": {
+    "idx": 1.049,
+    "priorIdx": 1.12,
+    "toDateIdx": 1.193,
+    "toDateGames": 6,
+    "toDatePPG": 20.1
+   },
+   "RB": {
+    "idx": 1.024,
+    "priorIdx": 1.17,
+    "toDateIdx": 1.02,
+    "toDateGames": 6,
+    "toDatePPG": 21.7
+   },
+   "WR": {
+    "idx": 1.007,
+    "priorIdx": 1.098,
+    "toDateIdx": 0.974,
+    "toDateGames": 6,
+    "toDatePPG": 31.4
+   },
+   "TE": {
+    "idx": 0.962,
+    "priorIdx": 0.854,
+    "toDateIdx": 0.885,
+    "toDateGames": 6,
+    "toDatePPG": 12.3
+   }
+  },
+  "KC": {
+   "QB": {
+    "idx": 0.939,
+    "priorIdx": 0.925,
+    "toDateIdx": 0.692,
+    "toDateGames": 5,
+    "toDatePPG": 11.6
+   },
+   "RB": {
+    "idx": 0.963,
+    "priorIdx": 0.874,
+    "toDateIdx": 0.879,
+    "toDateGames": 5,
+    "toDatePPG": 18.7
+   },
+   "WR": {
+    "idx": 0.928,
+    "priorIdx": 0.888,
+    "toDateIdx": 0.657,
+    "toDateGames": 5,
+    "toDatePPG": 21.2
+   },
+   "TE": {
+    "idx": 1.05,
+    "priorIdx": 0.828,
+    "toDateIdx": 1.436,
+    "toDateGames": 5,
+    "toDatePPG": 20
+   }
+  },
+  "LAC": {
+   "QB": {
+    "idx": 0.946,
+    "priorIdx": 0.772,
+    "toDateIdx": 0.85,
+    "toDateGames": 6,
+    "toDatePPG": 14.3
+   },
+   "RB": {
+    "idx": 1,
+    "priorIdx": 0.843,
+    "toDateIdx": 1.102,
+    "toDateGames": 6,
+    "toDatePPG": 23.5
+   },
+   "WR": {
+    "idx": 0.976,
+    "priorIdx": 0.891,
+    "toDateIdx": 0.942,
+    "toDateGames": 6,
+    "toDatePPG": 30.4
+   },
+   "TE": {
+    "idx": 0.938,
+    "priorIdx": 0.786,
+    "toDateIdx": 0.797,
+    "toDateGames": 6,
+    "toDatePPG": 11.1
+   }
+  },
+  "BUF": {
+   "QB": {
+    "idx": 1.03,
+    "priorIdx": 0.803,
+    "toDateIdx": 1.297,
+    "toDateGames": 6,
+    "toDatePPG": 21.8
+   },
+   "RB": {
+    "idx": 1.061,
+    "priorIdx": 1.089,
+    "toDateIdx": 1.279,
+    "toDateGames": 6,
+    "toDatePPG": 27.3
+   },
+   "WR": {
+    "idx": 1.039,
+    "priorIdx": 0.86,
+    "toDateIdx": 1.312,
+    "toDateGames": 6,
+    "toDatePPG": 42.3
+   },
+   "TE": {
+    "idx": 0.97,
+    "priorIdx": 0.605,
+    "toDateIdx": 1.096,
+    "toDateGames": 6,
+    "toDatePPG": 15.3
+   }
+  },
+  "NE": {
+   "QB": {
+    "idx": 0.958,
+    "priorIdx": 0.902,
+    "toDateIdx": 0.83,
+    "toDateGames": 6,
+    "toDatePPG": 14
+   },
+   "RB": {
+    "idx": 0.977,
+    "priorIdx": 0.854,
+    "toDateIdx": 0.969,
+    "toDateGames": 6,
+    "toDatePPG": 20.7
+   },
+   "WR": {
+    "idx": 0.991,
+    "priorIdx": 0.949,
+    "toDateIdx": 0.984,
+    "toDateGames": 6,
+    "toDatePPG": 31.7
+   },
+   "TE": {
+    "idx": 0.964,
+    "priorIdx": 1.103,
+    "toDateIdx": 0.732,
+    "toDateGames": 6,
+    "toDatePPG": 10.2
+   }
+  },
+  "ARI": {
+   "QB": {
+    "idx": 1.056,
+    "priorIdx": 1.04,
+    "toDateIdx": 1.285,
+    "toDateGames": 6,
+    "toDatePPG": 21.6
+   },
+   "RB": {
+    "idx": 1.017,
+    "priorIdx": 1.194,
+    "toDateIdx": 0.964,
+    "toDateGames": 6,
+    "toDatePPG": 20.6
+   },
+   "WR": {
+    "idx": 1.012,
+    "priorIdx": 0.98,
+    "toDateIdx": 1.083,
+    "toDateGames": 6,
+    "toDatePPG": 34.9
+   },
+   "TE": {
+    "idx": 1.1,
+    "priorIdx": 1.274,
+    "toDateIdx": 1.374,
+    "toDateGames": 6,
+    "toDatePPG": 19.1
+   }
+  },
+  "ATL": {
+   "QB": {
+    "idx": 1.018,
+    "priorIdx": 1.001,
+    "toDateIdx": 1.101,
+    "toDateGames": 6,
+    "toDatePPG": 18.5
+   },
+   "RB": {
+    "idx": 1.009,
+    "priorIdx": 0.979,
+    "toDateIdx": 1.061,
+    "toDateGames": 6,
+    "toDatePPG": 22.6
+   },
+   "WR": {
+    "idx": 1.038,
+    "priorIdx": 1.093,
+    "toDateIdx": 1.147,
+    "toDateGames": 6,
+    "toDatePPG": 37
+   },
+   "TE": {
+    "idx": 0.994,
+    "priorIdx": 0.767,
+    "toDateIdx": 1.122,
+    "toDateGames": 6,
+    "toDatePPG": 15.6
+   }
+  },
+  "LV": {
+   "QB": {
+    "idx": 1.038,
+    "priorIdx": 0.987,
+    "toDateIdx": 1.219,
+    "toDateGames": 6,
+    "toDatePPG": 20.5
+   },
+   "RB": {
+    "idx": 1.026,
+    "priorIdx": 1.045,
+    "toDateIdx": 1.113,
+    "toDateGames": 6,
+    "toDatePPG": 23.7
+   },
+   "WR": {
+    "idx": 1.013,
+    "priorIdx": 1.089,
+    "toDateIdx": 1.01,
+    "toDateGames": 6,
+    "toDatePPG": 32.6
+   },
+   "TE": {
+    "idx": 1.02,
+    "priorIdx": 0.756,
+    "toDateIdx": 1.273,
+    "toDateGames": 6,
+    "toDatePPG": 17.7
+   }
+  },
+  "DEN": {
+   "QB": {
+    "idx": 0.964,
+    "priorIdx": 0.871,
+    "toDateIdx": 0.887,
+    "toDateGames": 6,
+    "toDatePPG": 14.9
+   },
+   "RB": {
+    "idx": 0.994,
+    "priorIdx": 0.772,
+    "toDateIdx": 1.116,
+    "toDateGames": 6,
+    "toDatePPG": 23.8
+   },
+   "WR": {
+    "idx": 0.966,
+    "priorIdx": 0.878,
+    "toDateIdx": 0.894,
+    "toDateGames": 6,
+    "toDatePPG": 28.8
+   },
+   "TE": {
+    "idx": 0.993,
+    "priorIdx": 1.027,
+    "toDateIdx": 0.945,
+    "toDateGames": 6,
+    "toDatePPG": 13.1
+   }
+  },
+  "GB": {
+   "QB": {
+    "idx": 0.94,
+    "priorIdx": 0.921,
+    "toDateIdx": 0.721,
+    "toDateGames": 6,
+    "toDatePPG": 12.1
+   },
+   "RB": {
+    "idx": 1.044,
+    "priorIdx": 0.977,
+    "toDateIdx": 1.258,
+    "toDateGames": 6,
+    "toDatePPG": 26.8
+   },
+   "WR": {
+    "idx": 1.006,
+    "priorIdx": 1.015,
+    "toDateIdx": 1.022,
+    "toDateGames": 6,
+    "toDatePPG": 33
+   },
+   "TE": {
+    "idx": 0.936,
+    "priorIdx": 0.911,
+    "toDateIdx": 0.704,
+    "toDateGames": 6,
+    "toDatePPG": 9.8
+   }
+  },
+  "IND": {
+   "QB": {
+    "idx": 1.021,
+    "priorIdx": 1.037,
+    "toDateIdx": 1.095,
+    "toDateGames": 6,
+    "toDatePPG": 18.4
+   },
+   "RB": {
+    "idx": 1.011,
+    "priorIdx": 0.908,
+    "toDateIdx": 1.123,
+    "toDateGames": 6,
+    "toDatePPG": 23.9
+   },
+   "WR": {
+    "idx": 1.013,
+    "priorIdx": 1.174,
+    "toDateIdx": 0.956,
+    "toDateGames": 6,
+    "toDatePPG": 30.8
+   },
+   "TE": {
+    "idx": 1.009,
+    "priorIdx": 1.146,
+    "toDateIdx": 0.953,
+    "toDateGames": 6,
+    "toDatePPG": 13.3
+   }
+  },
+  "PHI": {
+   "QB": {
+    "idx": 1.009,
+    "priorIdx": 0.891,
+    "toDateIdx": 1.123,
+    "toDateGames": 6,
+    "toDatePPG": 18.9
+   },
+   "RB": {
+    "idx": 0.997,
+    "priorIdx": 1.036,
+    "toDateIdx": 0.96,
+    "toDateGames": 6,
+    "toDatePPG": 20.5
+   },
+   "WR": {
+    "idx": 1.018,
+    "priorIdx": 0.87,
+    "toDateIdx": 1.187,
+    "toDateGames": 6,
+    "toDatePPG": 38.3
+   },
+   "TE": {
+    "idx": 0.926,
+    "priorIdx": 0.627,
+    "toDateIdx": 0.84,
+    "toDateGames": 6,
+    "toDatePPG": 11.7
+   }
+  },
+  "MIA": {
+   "QB": {
+    "idx": 1.035,
+    "priorIdx": 1.114,
+    "toDateIdx": 1.118,
+    "toDateGames": 5,
+    "toDatePPG": 18.8
+   },
+   "RB": {
+    "idx": 1.055,
+    "priorIdx": 1.132,
+    "toDateIdx": 1.225,
+    "toDateGames": 5,
+    "toDatePPG": 26.1
+   },
+   "WR": {
+    "idx": 0.949,
+    "priorIdx": 0.971,
+    "toDateIdx": 0.719,
+    "toDateGames": 5,
+    "toDatePPG": 23.2
+   },
+   "TE": {
+    "idx": 1.101,
+    "priorIdx": 1.224,
+    "toDateIdx": 1.424,
+    "toDateGames": 5,
+    "toDatePPG": 19.8
+   }
+  },
+  "CAR": {
+   "QB": {
+    "idx": 0.991,
+    "priorIdx": 0.848,
+    "toDateIdx": 1.069,
+    "toDateGames": 5,
+    "toDatePPG": 18
+   },
+   "RB": {
+    "idx": 1.047,
+    "priorIdx": 1.099,
+    "toDateIdx": 1.205,
+    "toDateGames": 5,
+    "toDatePPG": 25.7
+   },
+   "WR": {
+    "idx": 0.968,
+    "priorIdx": 0.864,
+    "toDateIdx": 0.917,
+    "toDateGames": 5,
+    "toDatePPG": 29.6
+   },
+   "TE": {
+    "idx": 1.029,
+    "priorIdx": 1.031,
+    "toDateIdx": 1.147,
+    "toDateGames": 5,
+    "toDatePPG": 16
+   }
+  },
+  "SEA": {
+   "QB": {
+    "idx": 0.922,
+    "priorIdx": 0.859,
+    "toDateIdx": 0.663,
+    "toDateGames": 6,
+    "toDatePPG": 11.2
+   },
+   "RB": {
+    "idx": 0.988,
+    "priorIdx": 0.842,
+    "toDateIdx": 1.037,
+    "toDateGames": 6,
+    "toDatePPG": 22.1
+   },
+   "WR": {
+    "idx": 0.933,
+    "priorIdx": 0.853,
+    "toDateIdx": 0.725,
+    "toDateGames": 6,
+    "toDatePPG": 23.4
+   },
+   "TE": {
+    "idx": 0.948,
+    "priorIdx": 1.104,
+    "toDateIdx": 0.641,
+    "toDateGames": 6,
+    "toDatePPG": 8.9
+   }
+  },
+  "CLE": {
+   "QB": {
+    "idx": 0.971,
+    "priorIdx": 0.817,
+    "toDateIdx": 0.96,
+    "toDateGames": 6,
+    "toDatePPG": 16.2
+   },
+   "RB": {
+    "idx": 0.956,
+    "priorIdx": 0.995,
+    "toDateIdx": 0.758,
+    "toDateGames": 6,
+    "toDatePPG": 16.1
+   },
+   "WR": {
+    "idx": 0.992,
+    "priorIdx": 0.874,
+    "toDateIdx": 1.037,
+    "toDateGames": 6,
+    "toDatePPG": 33.4
+   },
+   "TE": {
+    "idx": 1.001,
+    "priorIdx": 0.911,
+    "toDateIdx": 1.062,
+    "toDateGames": 6,
+    "toDatePPG": 14.8
+   }
+  },
+  "NO": {
+   "QB": {
+    "idx": 0.994,
+    "priorIdx": 0.859,
+    "toDateIdx": 1.062,
+    "toDateGames": 6,
+    "toDatePPG": 17.9
+   },
+   "RB": {
+    "idx": 1.067,
+    "priorIdx": 0.943,
+    "toDateIdx": 1.41,
+    "toDateGames": 6,
+    "toDatePPG": 30.1
+   },
+   "WR": {
+    "idx": 0.987,
+    "priorIdx": 0.903,
+    "toDateIdx": 0.991,
+    "toDateGames": 6,
+    "toDatePPG": 31.9
+   },
+   "TE": {
+    "idx": 1.044,
+    "priorIdx": 0.938,
+    "toDateIdx": 1.288,
+    "toDateGames": 6,
+    "toDatePPG": 17.9
+   }
+  },
+  "TB": {
+   "QB": {
+    "idx": 0.997,
+    "priorIdx": 1.193,
+    "toDateIdx": 0.852,
+    "toDateGames": 6,
+    "toDatePPG": 14.3
+   },
+   "RB": {
+    "idx": 0.965,
+    "priorIdx": 1.005,
+    "toDateIdx": 0.801,
+    "toDateGames": 6,
+    "toDatePPG": 17.1
+   },
+   "WR": {
+    "idx": 1.008,
+    "priorIdx": 1.022,
+    "toDateIdx": 1.03,
+    "toDateGames": 6,
+    "toDatePPG": 33.2
+   },
+   "TE": {
+    "idx": 1.045,
+    "priorIdx": 1.189,
+    "toDateIdx": 1.126,
+    "toDateGames": 6,
+    "toDatePPG": 15.7
+   }
+  },
+  "SF": {
+   "QB": {
+    "idx": 0.98,
+    "priorIdx": 1.049,
+    "toDateIdx": 0.856,
+    "toDateGames": 6,
+    "toDatePPG": 14.4
+   },
+   "RB": {
+    "idx": 1.026,
+    "priorIdx": 1.074,
+    "toDateIdx": 1.098,
+    "toDateGames": 6,
+    "toDatePPG": 23.4
+   },
+   "WR": {
+    "idx": 0.993,
+    "priorIdx": 1.045,
+    "toDateIdx": 0.934,
+    "toDateGames": 6,
+    "toDatePPG": 30.1
+   },
+   "TE": {
+    "idx": 0.953,
+    "priorIdx": 1.115,
+    "toDateIdx": 0.66,
+    "toDateGames": 6,
+    "toDatePPG": 9.2
+   }
+  },
+  "JAX": {
+   "QB": {
+    "idx": 0.982,
+    "priorIdx": 0.973,
+    "toDateIdx": 0.921,
+    "toDateGames": 6,
+    "toDatePPG": 15.5
+   },
+   "RB": {
+    "idx": 0.946,
+    "priorIdx": 0.834,
+    "toDateIdx": 0.811,
+    "toDateGames": 6,
+    "toDatePPG": 17.3
+   },
+   "WR": {
+    "idx": 1.034,
+    "priorIdx": 1.015,
+    "toDateIdx": 1.18,
+    "toDateGames": 6,
+    "toDatePPG": 38
+   },
+   "TE": {
+    "idx": 0.986,
+    "priorIdx": 1.111,
+    "toDateIdx": 0.849,
+    "toDateGames": 6,
+    "toDatePPG": 11.8
+   }
+  },
+  "LA": {
+   "QB": {
+    "idx": 0.989,
+    "priorIdx": 0.93,
+    "toDateIdx": 0.986,
+    "toDateGames": 6,
+    "toDatePPG": 16.6
+   },
+   "RB": {
+    "idx": 0.976,
+    "priorIdx": 0.918,
+    "toDateIdx": 0.922,
+    "toDateGames": 6,
+    "toDatePPG": 19.7
+   },
+   "WR": {
+    "idx": 0.974,
+    "priorIdx": 1.03,
+    "toDateIdx": 0.836,
+    "toDateGames": 6,
+    "toDatePPG": 26.9
+   },
+   "TE": {
+    "idx": 0.926,
+    "priorIdx": 0.987,
+    "toDateIdx": 0.598,
+    "toDateGames": 6,
+    "toDatePPG": 8.3
+   }
+  },
+  "TEN": {
+   "QB": {
+    "idx": 0.999,
+    "priorIdx": 1.169,
+    "toDateIdx": 0.884,
+    "toDateGames": 6,
+    "toDatePPG": 14.9
+   },
+   "RB": {
+    "idx": 0.986,
+    "priorIdx": 0.975,
+    "toDateIdx": 0.937,
+    "toDateGames": 6,
+    "toDatePPG": 20
+   },
+   "WR": {
+    "idx": 1.039,
+    "priorIdx": 1.156,
+    "toDateIdx": 1.113,
+    "toDateGames": 6,
+    "toDatePPG": 35.9
+   },
+   "TE": {
+    "idx": 0.963,
+    "priorIdx": 1.065,
+    "toDateIdx": 0.752,
+    "toDateGames": 6,
+    "toDatePPG": 10.5
+   }
+  },
+  "PIT": {
+   "QB": {
+    "idx": 0.966,
+    "priorIdx": 1.153,
+    "toDateIdx": 0.708,
+    "toDateGames": 6,
+    "toDatePPG": 11.9
+   },
+   "RB": {
+    "idx": 0.979,
+    "priorIdx": 0.886,
+    "toDateIdx": 0.959,
+    "toDateGames": 6,
+    "toDatePPG": 20.4
+   },
+   "WR": {
+    "idx": 0.999,
+    "priorIdx": 1.145,
+    "toDateIdx": 0.898,
+    "toDateGames": 6,
+    "toDatePPG": 29
+   },
+   "TE": {
+    "idx": 1.002,
+    "priorIdx": 1.249,
+    "toDateIdx": 0.843,
+    "toDateGames": 6,
+    "toDatePPG": 11.7
+   }
+  },
+  "DAL": {
+   "QB": {
+    "idx": 1.099,
+    "priorIdx": 1.431,
+    "toDateIdx": 1.265,
+    "toDateGames": 6,
+    "toDatePPG": 21.3
+   },
+   "RB": {
+    "idx": 1.032,
+    "priorIdx": 1.134,
+    "toDateIdx": 1.088,
+    "toDateGames": 6,
+    "toDatePPG": 23.2
+   },
+   "WR": {
+    "idx": 1.055,
+    "priorIdx": 1.277,
+    "toDateIdx": 1.122,
+    "toDateGames": 6,
+    "toDatePPG": 36.2
+   },
+   "TE": {
+    "idx": 0.977,
+    "priorIdx": 0.929,
+    "toDateIdx": 0.92,
+    "toDateGames": 6,
+    "toDatePPG": 12.8
+   }
+  },
+  "MIN": {
+   "QB": {
+    "idx": 0.874,
+    "priorIdx": 0.682,
+    "toDateIdx": 0.498,
+    "toDateGames": 5,
+    "toDatePPG": 8.4
+   },
+   "RB": {
+    "idx": 0.93,
+    "priorIdx": 0.891,
+    "toDateIdx": 0.67,
+    "toDateGames": 5,
+    "toDatePPG": 14.3
+   },
+   "WR": {
+    "idx": 0.943,
+    "priorIdx": 0.771,
+    "toDateIdx": 0.842,
+    "toDateGames": 5,
+    "toDatePPG": 27.1
+   },
+   "TE": {
+    "idx": 0.898,
+    "priorIdx": 0.801,
+    "toDateIdx": 0.548,
+    "toDateGames": 5,
+    "toDatePPG": 7.6
+   }
+  },
+  "BAL": {
+   "QB": {
+    "idx": 0.989,
+    "priorIdx": 1.086,
+    "toDateIdx": 0.883,
+    "toDateGames": 6,
+    "toDatePPG": 14.9
+   },
+   "RB": {
+    "idx": 0.983,
+    "priorIdx": 1.053,
+    "toDateIdx": 0.869,
+    "toDateGames": 6,
+    "toDatePPG": 18.5
+   },
+   "WR": {
+    "idx": 1.031,
+    "priorIdx": 1.168,
+    "toDateIdx": 1.057,
+    "toDateGames": 6,
+    "toDatePPG": 34.1
+   },
+   "TE": {
+    "idx": 0.934,
+    "priorIdx": 0.821,
+    "toDateIdx": 0.751,
+    "toDateGames": 6,
+    "toDatePPG": 10.5
+   }
+  },
+  "DET": {
+   "QB": {
+    "idx": 1.12,
+    "priorIdx": 1.118,
+    "toDateIdx": 1.626,
+    "toDateGames": 5,
+    "toDatePPG": 27.4
+   },
+   "RB": {
+    "idx": 0.963,
+    "priorIdx": 0.882,
+    "toDateIdx": 0.875,
+    "toDateGames": 5,
+    "toDatePPG": 18.7
+   },
+   "WR": {
+    "idx": 1.065,
+    "priorIdx": 1.16,
+    "toDateIdx": 1.264,
+    "toDateGames": 5,
+    "toDatePPG": 40.8
+   },
+   "TE": {
+    "idx": 1.219,
+    "priorIdx": 1.028,
+    "toDateIdx": 2.293,
+    "toDateGames": 5,
+    "toDatePPG": 31.9
+   }
+  }
+ },
+ "schedule": {
+  "CHI": {
+   "games": 11,
+   "opponents": [
+    "7:NE",
+    "8:SEA",
+    "9:TB",
+    "11:NO",
+    "12:DET",
+    "13:JAX",
+    "14:MIA",
+    "15:BUF",
+    "16:GB",
+    "17:DET",
+    "18:MIN"
+   ],
+   "ros": {
+    "QB": 0.997,
+    "RB": 0.996,
+    "WR": 1.002,
+    "TE": 1.03
+   },
+   "playoffs": {
+    "QB": 1.03,
+    "RB": 1.023,
+    "WR": 1.037,
+    "TE": 1.042
+   },
+   "rank": {
+    "QB": 16,
+    "RB": 20,
+    "WR": 15,
+    "TE": 3
+   }
+  },
+  "NE": {
+   "games": 11,
+   "opponents": [
+    "7:CHI",
+    "8:MIA",
+    "9:GB",
+    "10:DET",
+    "12:LAC",
+    "13:BUF",
+    "14:MIN",
+    "15:KC",
+    "16:NYJ",
+    "17:DEN",
+    "18:MIA"
+   ],
+   "ros": {
+    "QB": 0.992,
+    "RB": 1.006,
+    "WR": 0.985,
+    "TE": 1.011
+   },
+   "playoffs": {
+    "QB": 0.97,
+    "RB": 0.998,
+    "WR": 0.961,
+    "TE": 1.001
+   },
+   "rank": {
+    "QB": 24,
+    "RB": 10,
+    "WR": 29,
+    "TE": 9
+   }
+  },
+  "NO": {
+   "games": 11,
+   "opponents": [
+    "7:PIT",
+    "9:CLE",
+    "10:CAR",
+    "11:CHI",
+    "12:CIN",
+    "13:GB",
+    "14:CAR",
+    "15:TB",
+    "16:ARI",
+    "17:ATL",
+    "18:TB"
+   ],
+   "ros": {
+    "QB": 0.997,
+    "RB": 1,
+    "WR": 0.998,
+    "TE": 1.022
+   },
+   "playoffs": {
+    "QB": 1.024,
+    "RB": 0.997,
+    "WR": 1.019,
+    "TE": 1.046
+   },
+   "rank": {
+    "QB": 17,
+    "RB": 15,
+    "WR": 17,
+    "TE": 6
+   }
+  },
+  "PIT": {
+   "games": 11,
+   "opponents": [
+    "7:NO",
+    "8:CLE",
+    "10:CIN",
+    "11:PHI",
+    "12:DEN",
+    "13:HOU",
+    "14:JAX",
+    "15:BAL",
+    "16:CAR",
+    "17:TEN",
+    "18:BAL"
+   ],
+   "ros": {
+    "QB": 0.99,
+    "RB": 0.995,
+    "WR": 1.004,
+    "TE": 0.988
+   },
+   "playoffs": {
+    "QB": 0.993,
+    "RB": 1.005,
+    "WR": 1.013,
+    "TE": 0.975
+   },
+   "rank": {
+    "QB": 26,
+    "RB": 21,
+    "WR": 13,
+    "TE": 21
+   }
+  },
+  "ATL": {
+   "games": 11,
+   "opponents": [
+    "7:SF",
+    "8:TB",
+    "9:CIN",
+    "10:KC",
+    "12:MIN",
+    "13:DET",
+    "14:CLE",
+    "15:WAS",
+    "16:TB",
+    "17:NO",
+    "18:CAR"
+   ],
+   "ros": {
+    "QB": 0.996,
+    "RB": 0.991,
+    "WR": 0.99,
+    "TE": 1.047
+   },
+   "playoffs": {
+    "QB": 1.024,
+    "RB": 1.011,
+    "WR": 1.011,
+    "TE": 1.07
+   },
+   "rank": {
+    "QB": 18,
+    "RB": 27,
+    "WR": 23,
+    "TE": 1
+   }
+  },
+  "SF": {
+   "games": 11,
+   "opponents": [
+    "7:ATL",
+    "9:LV",
+    "10:DAL",
+    "11:MIN",
+    "12:SEA",
+    "13:NYG",
+    "14:LA",
+    "15:LAC",
+    "16:KC",
+    "17:PHI",
+    "18:ARI"
+   ],
+   "ros": {
+    "QB": 0.994,
+    "RB": 0.997,
+    "WR": 0.991,
+    "TE": 0.976
+   },
+   "playoffs": {
+    "QB": 0.965,
+    "RB": 0.987,
+    "WR": 0.974,
+    "TE": 0.971
+   },
+   "rank": {
+    "QB": 20,
+    "RB": 17,
+    "WR": 21,
+    "TE": 31
+   }
+  },
+  "BAL": {
+   "games": 11,
+   "opponents": [
+    "7:CIN",
+    "8:BUF",
+    "9:JAX",
+    "10:LAC",
+    "11:CAR",
+    "12:HOU",
+    "14:TB",
+    "15:PIT",
+    "16:CLE",
+    "17:CIN",
+    "18:PIT"
+   ],
+   "ros": {
+    "QB": 0.988,
+    "RB": 0.994,
+    "WR": 0.996,
+    "TE": 1.013
+   },
+   "playoffs": {
+    "QB": 0.984,
+    "RB": 0.984,
+    "WR": 0.984,
+    "TE": 1.037
+   },
+   "rank": {
+    "QB": 28,
+    "RB": 24,
+    "WR": 20,
+    "TE": 8
+   }
+  },
+  "CIN": {
+   "games": 12,
+   "opponents": [
+    "7:BAL",
+    "8:TEN",
+    "9:ATL",
+    "10:PIT",
+    "11:WAS",
+    "12:NO",
+    "13:CLE",
+    "14:KC",
+    "15:CAR",
+    "16:IND",
+    "17:BAL",
+    "18:CLE"
+   ],
+   "ros": {
+    "QB": 0.994,
+    "RB": 0.995,
+    "WR": 1.005,
+    "TE": 1.007
+   },
+   "playoffs": {
+    "QB": 1,
+    "RB": 1.014,
+    "WR": 1.004,
+    "TE": 0.991
+   },
+   "rank": {
+    "QB": 21,
+    "RB": 22,
+    "WR": 11,
+    "TE": 13
+   }
+  },
+  "CAR": {
+   "games": 12,
+   "opponents": [
+    "7:TB",
+    "8:GB",
+    "9:DEN",
+    "10:NO",
+    "11:BAL",
+    "12:TB",
+    "13:MIN",
+    "14:NO",
+    "15:CIN",
+    "16:PIT",
+    "17:SEA",
+    "18:ATL"
+   ],
+   "ros": {
+    "QB": 0.973,
+    "RB": 1.001,
+    "WR": 0.989,
+    "TE": 0.999
+   },
+   "playoffs": {
+    "QB": 0.968,
+    "RB": 0.995,
+    "WR": 0.964,
+    "TE": 1.02
+   },
+   "rank": {
+    "QB": 32,
+    "RB": 14,
+    "WR": 26,
+    "TE": 16
+   }
+  },
+  "TB": {
+   "games": 11,
+   "opponents": [
+    "7:CAR",
+    "8:ATL",
+    "9:CHI",
+    "11:DET",
+    "12:CAR",
+    "13:LAC",
+    "14:BAL",
+    "15:NO",
+    "16:ATL",
+    "17:LA",
+    "18:NO"
+   ],
+   "ros": {
+    "QB": 1.007,
+    "RB": 1.012,
+    "WR": 1.005,
+    "TE": 1.01
+   },
+   "playoffs": {
+    "QB": 1,
+    "RB": 1.017,
+    "WR": 1,
+    "TE": 0.988
+   },
+   "rank": {
+    "QB": 10,
+    "RB": 3,
+    "WR": 12,
+    "TE": 10
+   }
+  },
+  "HOU": {
+   "games": 11,
+   "opponents": [
+    "7:NYG",
+    "9:LAC",
+    "10:CLE",
+    "11:IND",
+    "12:BAL",
+    "13:PIT",
+    "14:WAS",
+    "15:JAX",
+    "16:PHI",
+    "17:GB",
+    "18:TEN"
+   ],
+   "ros": {
+    "QB": 0.996,
+    "RB": 0.993,
+    "WR": 1.014,
+    "TE": 0.98
+   },
+   "playoffs": {
+    "QB": 0.977,
+    "RB": 0.996,
+    "WR": 1.019,
+    "TE": 0.949
+   },
+   "rank": {
+    "QB": 19,
+    "RB": 26,
+    "WR": 5,
+    "TE": 30
+   }
+  },
+  "NYG": {
+   "games": 11,
+   "opponents": [
+    "7:HOU",
+    "9:PHI",
+    "10:WAS",
+    "11:JAX",
+    "12:IND",
+    "13:SF",
+    "14:SEA",
+    "15:CLE",
+    "16:DET",
+    "17:DAL",
+    "18:PHI"
+   ],
+   "ros": {
+    "QB": 1.017,
+    "RB": 0.99,
+    "WR": 1.016,
+    "TE": 1.001
+   },
+   "playoffs": {
+    "QB": 1.063,
+    "RB": 0.984,
+    "WR": 1.037,
+    "TE": 1.066
+   },
+   "rank": {
+    "QB": 5,
+    "RB": 29,
+    "WR": 4,
+    "TE": 15
+   }
+  },
+  "MIN": {
+   "games": 12,
+   "opponents": [
+    "7:IND",
+    "8:DET",
+    "9:BUF",
+    "10:GB",
+    "11:SF",
+    "12:ATL",
+    "13:CAR",
+    "14:NE",
+    "15:DET",
+    "16:WAS",
+    "17:NYJ",
+    "18:CHI"
+   ],
+   "ros": {
+    "QB": 1.024,
+    "RB": 1.008,
+    "WR": 1.019,
+    "TE": 1.028
+   },
+   "playoffs": {
+    "QB": 1.07,
+    "RB": 1,
+    "WR": 1.031,
+    "TE": 1.101
+   },
+   "rank": {
+    "QB": 2,
+    "RB": 8,
+    "WR": 3,
+    "TE": 4
+   }
+  },
+  "IND": {
+   "games": 11,
+   "opponents": [
+    "7:MIN",
+    "8:JAX",
+    "9:DAL",
+    "10:MIA",
+    "11:HOU",
+    "12:NYG",
+    "14:PHI",
+    "15:TEN",
+    "16:CIN",
+    "17:CLE",
+    "18:JAX"
+   ],
+   "ros": {
+    "QB": 1.001,
+    "RB": 0.987,
+    "WR": 1.004,
+    "TE": 0.987
+   },
+   "playoffs": {
+    "QB": 0.995,
+    "RB": 0.986,
+    "WR": 0.997,
+    "TE": 1.024
+   },
+   "rank": {
+    "QB": 13,
+    "RB": 31,
+    "WR": 14,
+    "TE": 22
+   }
+  },
+  "NYJ": {
+   "games": 11,
+   "opponents": [
+    "7:MIA",
+    "8:LV",
+    "9:KC",
+    "10:BUF",
+    "11:LAC",
+    "12:MIA",
+    "14:DEN",
+    "15:ARI",
+    "16:NE",
+    "17:MIN",
+    "18:BUF"
+   ],
+   "ros": {
+    "QB": 0.991,
+    "RB": 1.013,
+    "WR": 0.982,
+    "TE": 1.01
+   },
+   "playoffs": {
+    "QB": 0.963,
+    "RB": 0.975,
+    "WR": 0.982,
+    "TE": 0.987
+   },
+   "rank": {
+    "QB": 25,
+    "RB": 2,
+    "WR": 30,
+    "TE": 11
+   }
+  },
+  "MIA": {
+   "games": 12,
+   "opponents": [
+    "7:NYJ",
+    "8:NE",
+    "9:DET",
+    "10:IND",
+    "11:BUF",
+    "12:NYJ",
+    "13:DEN",
+    "14:CHI",
+    "15:GB",
+    "16:LAC",
+    "17:BUF",
+    "18:NE"
+   ],
+   "ros": {
+    "QB": 1,
+    "RB": 1.01,
+    "WR": 1.007,
+    "TE": 0.987
+   },
+   "playoffs": {
+    "QB": 0.972,
+    "RB": 1.035,
+    "WR": 1.007,
+    "TE": 0.948
+   },
+   "rank": {
+    "QB": 14,
+    "RB": 5,
+    "WR": 8,
+    "TE": 23
+   }
+  },
+  "TEN": {
+   "games": 11,
+   "opponents": [
+    "7:CLE",
+    "8:CIN",
+    "10:JAX",
+    "11:DAL",
+    "12:JAX",
+    "13:WAS",
+    "14:DET",
+    "15:IND",
+    "16:LV",
+    "17:PIT",
+    "18:HOU"
+   ],
+   "ros": {
+    "QB": 1.024,
+    "RB": 0.986,
+    "WR": 1.02,
+    "TE": 1.034
+   },
+   "playoffs": {
+    "QB": 1.008,
+    "RB": 1.005,
+    "WR": 1.008,
+    "TE": 1.01
+   },
+   "rank": {
+    "QB": 3,
+    "RB": 32,
+    "WR": 2,
+    "TE": 2
+   }
+  },
+  "CLE": {
+   "games": 11,
+   "opponents": [
+    "7:TEN",
+    "8:PIT",
+    "9:NO",
+    "10:HOU",
+    "12:LV",
+    "13:CIN",
+    "14:ATL",
+    "15:NYG",
+    "16:BAL",
+    "17:IND",
+    "18:CIN"
+   ],
+   "ros": {
+    "QB": 1.009,
+    "RB": 1.008,
+    "WR": 1.006,
+    "TE": 1.008
+   },
+   "playoffs": {
+    "QB": 1.02,
+    "RB": 1.006,
+    "WR": 1.017,
+    "TE": 0.968
+   },
+   "rank": {
+    "QB": 8,
+    "RB": 9,
+    "WR": 10,
+    "TE": 12
+   }
+  },
+  "ARI": {
+   "games": 11,
+   "opponents": [
+    "7:DEN",
+    "8:DAL",
+    "9:SEA",
+    "10:LA",
+    "11:KC",
+    "12:WAS",
+    "13:PHI",
+    "15:NYJ",
+    "16:NO",
+    "17:LV",
+    "18:SF"
+   ],
+   "ros": {
+    "QB": 1.002,
+    "RB": 1.01,
+    "WR": 0.99,
+    "TE": 0.993
+   },
+   "playoffs": {
+    "QB": 1.013,
+    "RB": 1.044,
+    "WR": 0.997,
+    "TE": 1.008
+   },
+   "rank": {
+    "QB": 12,
+    "RB": 6,
+    "WR": 24,
+    "TE": 18
+   }
+  },
+  "DEN": {
+   "games": 11,
+   "opponents": [
+    "7:ARI",
+    "8:KC",
+    "9:CAR",
+    "11:LV",
+    "12:PIT",
+    "13:MIA",
+    "14:NYJ",
+    "15:LV",
+    "16:BUF",
+    "17:NE",
+    "18:LAC"
+   ],
+   "ros": {
+    "QB": 1,
+    "RB": 1.017,
+    "WR": 0.989,
+    "TE": 1.014
+   },
+   "playoffs": {
+    "QB": 1.009,
+    "RB": 1.021,
+    "WR": 1.014,
+    "TE": 0.985
+   },
+   "rank": {
+    "QB": 15,
+    "RB": 1,
+    "WR": 27,
+    "TE": 7
+   }
+  },
+  "DET": {
+   "games": 12,
+   "opponents": [
+    "7:GB",
+    "8:MIN",
+    "9:MIA",
+    "10:NE",
+    "11:TB",
+    "12:CHI",
+    "13:ATL",
+    "14:TEN",
+    "15:MIN",
+    "16:NYG",
+    "17:CHI",
+    "18:GB"
+   ],
+   "ros": {
+    "QB": 0.978,
+    "RB": 0.99,
+    "WR": 0.998,
+    "TE": 0.967
+   },
+   "playoffs": {
+    "QB": 0.983,
+    "RB": 0.971,
+    "WR": 0.991,
+    "TE": 0.938
+   },
+   "rank": {
+    "QB": 30,
+    "RB": 30,
+    "WR": 18,
+    "TE": 32
+   }
+  },
+  "GB": {
+   "games": 11,
+   "opponents": [
+    "7:DET",
+    "8:CAR",
+    "9:NE",
+    "10:MIN",
+    "12:LA",
+    "13:NO",
+    "14:BUF",
+    "15:MIA",
+    "16:CHI",
+    "17:HOU",
+    "18:DET"
+   ],
+   "ros": {
+    "QB": 1.012,
+    "RB": 0.997,
+    "WR": 1.002,
+    "TE": 1.025
+   },
+   "playoffs": {
+    "QB": 1.017,
+    "RB": 0.995,
+    "WR": 0.995,
+    "TE": 1.001
+   },
+   "rank": {
+    "QB": 7,
+    "RB": 18,
+    "WR": 16,
+    "TE": 5
+   }
+  },
+  "LV": {
+   "games": 11,
+   "opponents": [
+    "7:LA",
+    "8:NYJ",
+    "9:SF",
+    "10:SEA",
+    "11:DEN",
+    "12:CLE",
+    "14:LAC",
+    "15:DEN",
+    "16:TEN",
+    "17:ARI",
+    "18:KC"
+   ],
+   "ros": {
+    "QB": 0.976,
+    "RB": 0.994,
+    "WR": 0.979,
+    "TE": 0.984
+   },
+   "playoffs": {
+    "QB": 1.006,
+    "RB": 0.999,
+    "WR": 1.006,
+    "TE": 1.019
+   },
+   "rank": {
+    "QB": 31,
+    "RB": 25,
+    "WR": 31,
+    "TE": 26
+   }
+  },
+  "LA": {
+   "games": 11,
+   "opponents": [
+    "7:LV",
+    "8:LAC",
+    "9:WAS",
+    "10:ARI",
+    "12:GB",
+    "13:KC",
+    "14:SF",
+    "15:DAL",
+    "16:SEA",
+    "17:TB",
+    "18:SEA"
+   ],
+   "ros": {
+    "QB": 0.993,
+    "RB": 1.004,
+    "WR": 0.99,
+    "TE": 1.003
+   },
+   "playoffs": {
+    "QB": 1.006,
+    "RB": 0.995,
+    "WR": 0.999,
+    "TE": 0.99
+   },
+   "rank": {
+    "QB": 23,
+    "RB": 11,
+    "WR": 25,
+    "TE": 14
+   }
+  },
+  "SEA": {
+   "games": 11,
+   "opponents": [
+    "7:KC",
+    "8:CHI",
+    "9:ARI",
+    "10:LV",
+    "12:SF",
+    "13:DAL",
+    "14:NYG",
+    "15:PHI",
+    "16:LA",
+    "17:CAR",
+    "18:LA"
+   ],
+   "ros": {
+    "QB": 1.015,
+    "RB": 1.004,
+    "WR": 0.997,
+    "TE": 0.984
+   },
+   "playoffs": {
+    "QB": 0.996,
+    "RB": 1.007,
+    "WR": 0.987,
+    "TE": 0.96
+   },
+   "rank": {
+    "QB": 6,
+    "RB": 12,
+    "WR": 19,
+    "TE": 27
+   }
+  },
+  "KC": {
+   "games": 12,
+   "opponents": [
+    "7:SEA",
+    "8:DEN",
+    "9:NYJ",
+    "10:ATL",
+    "11:ARI",
+    "12:BUF",
+    "13:LA",
+    "14:CIN",
+    "15:NE",
+    "16:SF",
+    "17:LAC",
+    "18:LV"
+   ],
+   "ros": {
+    "QB": 0.994,
+    "RB": 1.011,
+    "WR": 0.991,
+    "TE": 0.99
+   },
+   "playoffs": {
+    "QB": 0.961,
+    "RB": 1.001,
+    "WR": 0.987,
+    "TE": 0.952
+   },
+   "rank": {
+    "QB": 22,
+    "RB": 4,
+    "WR": 22,
+    "TE": 19
+   }
+  },
+  "PHI": {
+   "games": 11,
+   "opponents": [
+    "7:DAL",
+    "8:WAS",
+    "9:NYG",
+    "11:PIT",
+    "12:DAL",
+    "13:ARI",
+    "14:IND",
+    "15:SEA",
+    "16:HOU",
+    "17:SF",
+    "18:NYG"
+   ],
+   "ros": {
+    "QB": 1.029,
+    "RB": 1.009,
+    "WR": 1.011,
+    "TE": 0.996
+   },
+   "playoffs": {
+    "QB": 0.964,
+    "RB": 0.995,
+    "WR": 0.98,
+    "TE": 0.949
+   },
+   "rank": {
+    "QB": 1,
+    "RB": 7,
+    "WR": 6,
+    "TE": 17
+   }
+  },
+  "DAL": {
+   "games": 11,
+   "opponents": [
+    "7:PHI",
+    "8:ARI",
+    "9:IND",
+    "10:SF",
+    "11:TEN",
+    "12:PHI",
+    "13:SEA",
+    "15:LA",
+    "16:JAX",
+    "17:NYG",
+    "18:WAS"
+   ],
+   "ros": {
+    "QB": 1.009,
+    "RB": 0.997,
+    "WR": 1.007,
+    "TE": 0.984
+   },
+   "playoffs": {
+    "QB": 1.007,
+    "RB": 0.982,
+    "WR": 1.005,
+    "TE": 0.958
+   },
+   "rank": {
+    "QB": 9,
+    "RB": 19,
+    "WR": 9,
+    "TE": 28
+   }
+  },
+  "BUF": {
+   "games": 11,
+   "opponents": [
+    "8:BAL",
+    "9:MIN",
+    "10:NYJ",
+    "11:MIA",
+    "12:KC",
+    "13:NE",
+    "14:GB",
+    "15:CHI",
+    "16:DEN",
+    "17:MIA",
+    "18:NYJ"
+   ],
+   "ros": {
+    "QB": 0.979,
+    "RB": 1.003,
+    "WR": 0.979,
+    "TE": 0.987
+   },
+   "playoffs": {
+    "QB": 1.008,
+    "RB": 1.003,
+    "WR": 0.979,
+    "TE": 1.016
+   },
+   "rank": {
+    "QB": 29,
+    "RB": 13,
+    "WR": 32,
+    "TE": 24
+   }
+  },
+  "JAX": {
+   "games": 11,
+   "opponents": [
+    "8:IND",
+    "9:BAL",
+    "10:TEN",
+    "11:NYG",
+    "12:TEN",
+    "13:CHI",
+    "14:PIT",
+    "15:HOU",
+    "16:DAL",
+    "17:WAS",
+    "18:IND"
+   ],
+   "ros": {
+    "QB": 1.022,
+    "RB": 0.995,
+    "WR": 1.024,
+    "TE": 0.986
+   },
+   "playoffs": {
+    "QB": 1.057,
+    "RB": 1.001,
+    "WR": 1.035,
+    "TE": 1.015
+   },
+   "rank": {
+    "QB": 4,
+    "RB": 23,
+    "WR": 1,
+    "TE": 25
+   }
+  },
+  "LAC": {
+   "games": 11,
+   "opponents": [
+    "8:LA",
+    "9:HOU",
+    "10:BAL",
+    "11:NYJ",
+    "12:NE",
+    "13:TB",
+    "14:LV",
+    "15:SF",
+    "16:MIA",
+    "17:KC",
+    "18:DEN"
+   ],
+   "ros": {
+    "QB": 0.99,
+    "RB": 0.998,
+    "WR": 0.987,
+    "TE": 0.99
+   },
+   "playoffs": {
+    "QB": 0.985,
+    "RB": 1.015,
+    "WR": 0.957,
+    "TE": 1.035
+   },
+   "rank": {
+    "QB": 27,
+    "RB": 16,
+    "WR": 28,
+    "TE": 20
+   }
+  },
+  "WAS": {
+   "games": 11,
+   "opponents": [
+    "8:PHI",
+    "9:LA",
+    "10:NYG",
+    "11:CIN",
+    "12:ARI",
+    "13:TEN",
+    "14:HOU",
+    "15:ATL",
+    "16:MIN",
+    "17:JAX",
+    "18:DAL"
+   ],
+   "ros": {
+    "QB": 1.007,
+    "RB": 0.991,
+    "WR": 1.009,
+    "TE": 0.981
+   },
+   "playoffs": {
+    "QB": 0.958,
+    "RB": 0.962,
+    "WR": 1.005,
+    "TE": 0.959
+   },
+   "rank": {
+    "QB": 11,
+    "RB": 28,
+    "WR": 7,
+    "TE": 29
+   }
+  }
+ }
+}

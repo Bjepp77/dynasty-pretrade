@@ -15,11 +15,11 @@ cd ~/Code/dynasty-pretrade
 python3 -m http.server 8787
 # open http://localhost:8787
 ```
-No build step, no API keys. Refresh the data snapshots (Node 18+): `node scripts/fetch-values.mjs` (market values, daily) and `node scripts/fit-stats.mjs` (stats model, about 1 minute, after each season or roster change). Test the scoring in the terminal: `node test.js "Josh Allen" "Derrick Henry"`. Other formats: `QBS=2 PPR=0.5 node test.js`. The test also prints the Core assets, the top 5 per team type and two trades.
+No build step, no API keys. Refresh the data snapshots (Node 18+): `node scripts/fetch-values.mjs` (market values, daily), `node scripts/fit-sos.mjs` (strength of schedule, weekly in season) and `node scripts/fit-stats.mjs` (stats model, about 1 minute, after each season or roster change). Scheduled refresh of market values (launchd, cron or a GitHub Action, all shipped disabled): `docs/refresh.md`. Test the scoring in the terminal: `node test.js "Josh Allen" "Derrick Henry"`. Other formats: `QBS=2 PPR=0.5 node test.js`. The test also prints the Core assets, the top 5 per team type and two trades.
 
 ## Data
 - **Market value** (`data/values.json`, built by `scripts/fetch-values.mjs`): aggregate of FantasyCalc, Dynasty Daddy, DynastyProcess and Sleeper dynasty ADP for six formats (1QB/SF x PPR/half/standard), players and draft picks. KeepTradeCut and FantasyPros are excluded because their terms forbid scraping or republishing. Each source is rank-matched to the FantasyCalc scale, scored `100*(value/top)^0.5`, then combined by a coverage-weighted 20% trimmed mean. Details: `docs/market-model.md`.
-- **Stats model** (`data/stats.json`, built by `scripts/fit-stats.mjs`): per-position ridge regression on nflverse data (usage, share, efficiency, availability, age), trained 2018-2023 and tested on 2024 to 2025. It beats "last season's PPG" at every position (holdout R² QB 0.08 vs -0.17, RB 0.68 vs 0.61, WR 0.68 vs 0.55, TE 0.66 vs 0.53). Age curves and the chance a player is still a regular in 1-3 seasons are fitted from data. `statScoreNow` scores next season's projected PPG, `statScoreLong` the survival-weighted, discounted 3-season projection. Both use `100*Phi(z)` against the position's starter pool, so 50 = an average starter. Details: `docs/stats-model.md`.
+- **Stats model** (`data/stats.json`, built by `scripts/fit-stats.mjs`): per-position ridge regression on nflverse data (usage, share, efficiency, availability, age), trained 2018-2023 and tested on 2024 to 2025. It beats "last season's PPG" at every position (holdout R² QB 0.15 vs -0.17, RB 0.68 vs 0.61, WR 0.68 vs 0.55, TE 0.66 vs 0.53). The QB model adds rushing share, dropback volume and team context (team pass attempts, EPA per play, TDs per game); it is still under the 0.25 bar, so QB stat scores show a **Low confidence** tag in the UI (`meta.confidence` in `data/stats.json`). Age curves and the chance a player is still a regular in 1-3 seasons are fitted from data. `statScoreNow` scores next season's projected PPG, `statScoreLong` the survival-weighted, discounted 3-season projection. Both use `100*Phi(z)` against the position's starter pool, so 50 = an average starter. Details: `docs/stats-model.md`.
 - **Sleeper players** (live in the browser, cached for the day): team, injury status, depth chart.
 
 ## Overall score (0-100 per team type)
@@ -38,6 +38,13 @@ No build step, no API keys. Refresh the data snapshots (Node 18+): `node scripts
 - Archetype: Contender minus Rebuilder above 5 = Contender, below -5 = Rebuilder, otherwise Retooler. Persistence under 0.65 = Contender (an aging asset's only use is now; this catches every RB 29+). All three 85+ = Core asset.
 - Tag: under a 50% chance of still being a regular in 2 seasons while the now score is 50+ = "Sell before cliff". Best score under 40 = "Contender depth only" or "Low value".
 
+## Strength of schedule (display only)
+`node scripts/fit-sos.mjs` writes `data/sos.json` from nflverse weekly player stats and the nflverse schedule (`games.csv`).
+- Defense index per position = PPR points the defense allows per game to QBs, RBs, WRs or TEs (all players at the position summed per game), divided by the league average. 1.00 = average, above 1 = easier matchup.
+- Blend of last season and this season to date: `idx = 1 + s * (w * toDate + (1 - w) * prior - 1)`, `w = games / (games + K)`. K and s are fitted by predicting weeks 7-18 from the prior season plus weeks 1-6 (2023 to 2024 and 2024 to 2025, 256 defense-position rows). Fitted: K = 4 games, s = 0.3.
+- SOS for a team = mean index of its remaining opponents, plus the fantasy playoff weeks 15-17 alone. Rank 1 = easiest.
+- Validation is weak: correlation with the truth is QB 0.22, RB 0.26, WR 0.09, TE 0.27, and RMSE beats "every defense is average" by only 0-4%. Last season alone does not predict this season (WR -0.19). That is why the fitted shrink is strong (ROS indexes land within about +-5%) and why SOS is shown on the player card but is not part of any score.
+
 ## Trade mode
 Each asset's aggregate market value (FantasyCalc scale) is scaled by `(0.5 + overall/100) / (0.5 + market/100)` for each team type (only how that team type differs from the market counts, since value already prices the market). Each side is then **consolidated** with a power-sum `(sum v^1.3)^(1/1.3)`, so a 3-for-1 is not treated as the plain sum (roster spots and lineup slots make depth worth less than a star). p = 1.3 is fitted to FantasyCalc's own trade calculator rule (evidence in `docs/market-model.md`). The UI shows raw (plain sum) and adjusted totals.
 
@@ -49,13 +56,15 @@ Verdict per team type uses gap / average of the two adjusted sides: under 8.5% F
 ## Known estimates (hand-set, not fitted)
 - The market vs stats weights, the 0.65 persistence cutoff, the per-type horizon weights, the pick adjustments and the injury penalties above.
 - Market source weights (FantasyCalc 1.0, Dynasty Daddy 1.0, DynastyProcess 0.75, Sleeper ADP 0.6).
-- The old strength-of-schedule demo table is gone; schedule is no longer scored.
 
 ## Known limits
 - Market values are a snapshot (date shown in the app), not live. Re-run `scripts/fetch-values.mjs` to refresh.
 - The stats model is PPR only; half and standard formats change the market half only.
-- The QB stats model is weak (R² 0.08 on 35 players). Survival odds past age 36 rest on few players.
+- The QB stats model is weak (2025 holdout R² 0.15 on 35 players; 0.23-0.54 in 2022-2024 holdouts) and is flagged Low confidence in the UI. Survival odds past age 36 rest on few players.
 - 12-team leagues only.
+
+## Public deploy (GitHub Pages)
+`bash scripts/build-pages.sh` builds `dist/` (static files plus the three data snapshots, about 1 MB). It blanks the prefilled Sleeper league ID so visitors do not land on a private league (`PUBLIC=0` keeps it). Preview: `python3 -m http.server -d dist 8790`. `.github/workflows/pages.yml` deploys it on a manual run only. Nothing is pushed or deployed until the repo has a remote and the owner approves making it public. Write-up: `docs/case-study.md`.
 
 ## League tab (Sleeper import and title odds)
 Enter a public Sleeper league ID (default is a 12-team superflex test league), press Load, pick your team. No login; read-only API calls. Tests: `node test-league.js [leagueId]` (live data; `ME=<display_name> N=10000`).

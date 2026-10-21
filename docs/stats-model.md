@@ -16,7 +16,7 @@ Sample rules: feature season needs 3+ games; target season needs 6+ games. For h
 ## Metrics chosen and why
 Per-game and share metrics are used instead of totals, because games played is among the least predictable inputs. Efficiency and TD rates are included but get small weights after ridge shrinkage, since they are noisy.
 - All positions: last-year PPG and the prior year's PPG (two-year view), games played fraction (availability), age.
-- QB: pass attempts per game, rushing points per game (rushing yards x0.1 + TD x6; rushing is the most reliable QB fantasy edge and persists), EPA per dropback, CPOE, yards per attempt, sack rate.
+- QB: pass attempts per game, rushing points per game (rushing yards x0.1 + TD x6; rushing is the most reliable QB fantasy edge and persists), EPA per dropback, CPOE, yards per attempt, sack rate. Added 2026-10-21: dropbacks per game, carries per game, rushing share (QB carries / team carries), and team context from nflverse `stats_team_reg_<year>.csv` (team pass attempts per game, team EPA per play, team offensive TDs per game).
 - RB: carries per game, targets per game, target share, snap %, rush EPA per carry, yards per carry, yards per target. Opportunity (touches, snaps) predicts better than efficiency.
 - WR/TE: targets per game, target share, air-yards share, WOPR, snap %, receiving EPA per target, yards per target, aDOT, RACR (WR only). Target share, targets per game and WOPR are the stickiest of these.
 - Not available in the free files, so not used: YPRR (needs routes), red-zone share (needs play-by-play), NGS and PFR advanced stats (NGS file naming returned 404; PFR not wired up). These are the first things to add.
@@ -26,14 +26,16 @@ Baseline = last year's PPG used directly. h=1 uses features from 2024 and trains
 
 | Pos | n | R2 model | R2 baseline | MAE model | MAE baseline |
 |---|---|---|---|---|---|
-| QB | 35 | 0.078 | -0.168 | 3.18 | 3.80 |
+| QB | 35 | 0.145 | -0.168 | 3.05 | 3.80 |
 | RB | 78 | 0.677 | 0.611 | 2.62 | 2.79 |
 | WR | 141 | 0.681 | 0.546 | 2.26 | 2.63 |
 | TE | 84 | 0.660 | 0.528 | 1.83 | 2.10 |
 
 h=2 and h=3 holdouts (features 2023 and 2022, target 2025) beat the baseline by a wider margin (for example WR h3 R2 0.51 vs -0.11, RB h3 0.43 vs 0.04). These include imputed replacement-level targets for departed players, so they are flattering; use them as relative evidence, not absolute accuracy. Full numbers are in `data/stats.json` under `meta.holdout`.
 
-Caveats: QB holdout is a single noisy season with 35 players, so the 0.08 R2 should not be over-read (QB h2/h3 hold at 0.3-0.4). Ridge strength is picked by leave-one-year-out CV on the training years only.
+Caveats: QB holdout is a single noisy season with 35 players (QB h2/h3 now 0.44/0.32).
+
+QB rework (2026-10-21). Old features gave 2025 h=1 R2 0.078; with rushing share, volume and team context it is 0.145 (MAE 3.18 to 3.05). Rolling check with the same code and `HOLD_YEAR=<y> node scripts/fit-stats.mjs` (h=1, about 35 QBs each), old to new: 2022 0.362 to 0.397, 2023 0.210 to 0.229, 2024 0.528 to 0.544, 2025 0.078 to 0.145. The new features win every year, but 2025 is still under the 0.25 bar, so `meta.confidence.QB = "low"` and the UI tags QB stat scores Low confidence. Why QBs are hard: the starter pool is small, and next-season PPG turns on injuries, benchings and team changes that season stats cannot see. Top-of-pool scores are sensitive: Lamar Jackson's projection moved 18.0 to 17.3 PPG and his now score 53 to 29 because the pool is tight. Ridge strength is picked by leave-one-year-out CV on the training years only.
 
 ## Age curve (fitted, not hand-set)
 Each model includes age plus hinge terms at 24, 27, 29, 31, 33, so the age effect is a piecewise-linear function fitted jointly with the production and usage features. `ageCurves` in `data/stats.json` exports, per position and for h = 1, 2, 3, the effect in PPG by age (age is on Sep 1 of the feature season), plus `yearlyDeltaPPG` and `yearlyDeltaPct` (expected change in next-season PPG for being one year older, holding the other features fixed). Ages with fewer than 8 training rows are clamped, not extrapolated. The 3-year projection reads each horizon's own model, so the age decline is built into projPPG2 and projPPG3 rather than applied as a separate cliff.

@@ -96,7 +96,9 @@
           : archetype === "Rebuilder" ? " Value is in future seasons: best for a rebuilder."
           : " Balanced: fits a fringe team or holds for anyone.");
     }
-    return { p, overall, fit: overall, market: p.market, now, long, hasStats, archetype, tag, explanation, trend: p.trend, trendHint: trendHint(p) };
+    // positions whose stats model missed the h=1 holdout bar (meta.confidence from fit-stats.mjs) are flagged in the UI
+    const lowConf = hasStats && !!(db.statsMeta && db.statsMeta.confidence && db.statsMeta.confidence[p.pos] === "low");
+    return { p, overall, fit: overall, market: p.market, now, long, hasStats, lowConf, archetype, tag, explanation, trend: p.trend, trendHint: trendHint(p) };
   }
 
   // Trade: each asset's aggregate value is scaled by (0.5 + overall/100) / (0.5 + market/100) for the team type, then each side is

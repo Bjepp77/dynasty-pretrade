@@ -15,7 +15,7 @@ const IDS_URL = "https://raw.githubusercontent.com/dynastyprocess/data/master/fi
 const FIRST_YEAR = 2017; // needed so 2018 rows have a prior season
 const LAST_YEAR = 2025; // last complete regular season
 const TRAIN_FIRST = 2018; // first feature season used for training
-const HOLD_YEAR = 2025; // holdout target season (h=1: features 2024)
+const HOLD_YEAR = Number(process.env.HOLD_YEAR) || 2025; // holdout target season (h=1: features 2024)
 const HORIZONS = [1, 2, 3];
 const CLIFF_RATIO = 0.6; // cliff = next-season PPG below this share of this season's PPG (or out of the league)
 const CLIFF_PPG_FRAC = 0.5; // PPG kept, as a share of the no-cliff projection, if a cliff happens
@@ -26,6 +26,7 @@ const MIN_GP_TARGET = 6; // target season needs >= this many games
 const POS = ["QB", "RB", "WR", "TE"];
 const POOL = { QB: 12, RB: 24, WR: 36, TE: 12 }; // starter pool (z-score reference) per position
 const AGE_KNOTS = [24, 27, 29, 31, 33]; // hinge knots for the piecewise-linear age effect
+const LOW_CONF_R2 = 0.25; // h=1 holdout R2 below this flags the position as low confidence in the UI
 const LAMBDAS = [0.3, 1, 3, 10, 30, 100, 300, 1000];
 const NOW = new Date("2026-10-21T00:00:00Z"); // model-age reference is Sep 1 of the feature season
 
@@ -118,6 +119,21 @@ for (const y of years) {
   for (const [id, [s, n]] of acc) snapPct.set(id + "|" + y, s / n);
 }
 
+// team context per season (nflverse stats_team): team|year -> {att_pg, car_pg, epa_pp, tds_pg}
+const teamCtx = new Map();
+for (const y of years) {
+  const rows = parseCsv(await fetchCached(`stats_team_reg_${y}.csv`, `${NFLV}/stats_team/stats_team_reg_${y}.csv`));
+  for (const r of rows) {
+    if (r.season_type !== "REG") continue;
+    const g = num(r.games), att = num(r.attempts), sk = num(r.sacks_suffered), car = num(r.carries);
+    teamCtx.set(r.team + "|" + y, {
+      att_pg: att / g, car_pg: car / g, carries: car,
+      epa_pp: (num(r.passing_epa) + num(r.rushing_epa)) / (att + sk + car),
+      tds_pg: (num(r.passing_tds) + num(r.rushing_tds)) / g,
+    });
+  }
+}
+
 const season = new Map(); // gsis|year -> derived row
 const lastSeen = new Map(); // gsis -> last year with a row
 for (const y of years) {
@@ -141,6 +157,12 @@ for (const y of years) {
       adot: div(num(r.receiving_air_yards), tgt), racr: num(r.racr),
       snap_pct: snapPct.get(id + "|" + y) ?? NaN,
     };
+    const tc = teamCtx.get(r.recent_team + "|" + y);
+    row.db_pg = (nz(att) + nz(sacks)) / g; // dropbacks per game (pass volume incl. sacks)
+    row.rush_share = tc ? nz(car) / (tc.car_pg * Math.min(g, 17)) : NaN; // share of team carries in games played (approx.)
+    row.team_att_pg = tc ? tc.att_pg : NaN;
+    row.team_epa_pp = tc ? tc.epa_pp : NaN;
+    row.team_tds_pg = tc ? tc.tds_pg : NaN;
     if (!Number.isFinite(row.ppg)) continue;
     season.set(id + "|" + y, row);
     lastSeen.set(id, Math.max(lastSeen.get(id) || 0, y));
@@ -149,7 +171,7 @@ for (const y of years) {
 
 // ---------- features ----------
 const FEATS = { // [name, group]
-  QB: [["ppg", "prod"], ["ppg_prev", "prod"], ["att_pg", "usage"], ["rush_ppg", "usage"], ["epa_db", "eff"], ["cpoe", "eff"], ["ypa", "eff"], ["sack_rate", "eff"], ["gpf", "avail"], ["gpf_prev", "avail"]],
+  QB: [["ppg", "prod"], ["ppg_prev", "prod"], ["att_pg", "usage"], ["db_pg", "usage"], ["rush_ppg", "usage"], ["car_pg", "usage"], ["rush_share", "usage"], ["team_att_pg", "team"], ["team_epa_pp", "team"], ["team_tds_pg", "team"], ["epa_db", "eff"], ["cpoe", "eff"], ["ypa", "eff"], ["sack_rate", "eff"], ["gpf", "avail"], ["gpf_prev", "avail"]],
   RB: [["ppg", "prod"], ["ppg_prev", "prod"], ["car_pg", "usage"], ["tgt_pg", "usage"], ["target_share", "usage"], ["snap_pct", "usage"], ["rush_epa_pc", "eff"], ["ypc", "eff"], ["ypt", "eff"], ["gpf", "avail"], ["gpf_prev", "avail"]],
   WR: [["ppg", "prod"], ["ppg_prev", "prod"], ["tgt_pg", "usage"], ["target_share", "usage"], ["air_yards_share", "usage"], ["wopr", "usage"], ["snap_pct", "usage"], ["rec_epa_pt", "eff"], ["ypt", "eff"], ["adot", "eff"], ["racr", "eff"], ["gpf", "avail"], ["gpf_prev", "avail"]],
   TE: [["ppg", "prod"], ["ppg_prev", "prod"], ["tgt_pg", "usage"], ["target_share", "usage"], ["air_yards_share", "usage"], ["wopr", "usage"], ["snap_pct", "usage"], ["rec_epa_pt", "eff"], ["ypt", "eff"], ["adot", "eff"], ["gpf", "avail"], ["gpf_prev", "avail"]],
@@ -435,7 +457,7 @@ for (const r of season.values()) {
   const proj = HORIZONS.map((h) => Math.max(0, predRow(final[r.pos][h], row)));
   // components: PPG contribution of each feature group in the h=1 model, plus the intercept
   const M1 = final[r.pos][1], z = M1.Z(rawVec(r.pos, row, M1.clamp)), comp = { baseline: round(M1.b0) };
-  const groups = { prod: "recentProduction", usage: "usage", eff: "efficiency", avail: "availability" };
+  const groups = { prod: "recentProduction", usage: "usage", eff: "efficiency", avail: "availability", team: "teamContext" };
   FEATS[r.pos].forEach(([, g], j) => { const k = groups[g]; comp[k] = round((comp[k] || 0) + M1.b[j] * z[j]); });
   const off = M1.cols.indexOf("age");
   comp.age = round(z.slice(off).reduce((s, v, i) => s + M1.b[off + i] * v, 0));
@@ -494,6 +516,8 @@ fs.writeFileSync(OUT, JSON.stringify({
     discount: DISCOUNT, scoring: "PPR", source: "nflverse stats_player + snap_counts, dynastyprocess db_playerids",
     note: "statScoreNow/Long = 100*Phi(z), z vs the position starter pool (top N by the same metric; N: " + JSON.stringify(POOL) + "). 50 = average starter. statScoreLong uses longPPG = availability * sum_k discount^(k-1) * expPPG_k, expPPG_k = survival_k*PPGnoCliff_k + (1-survival_k)*0.5*PPGnoCliff_k; survival_k = prod(1 - cliffHazard), hazard = Harstad table blended with a nflverse logistic fit (see docs/stats-model.md).",
     holdout: report,
+    // h=1 holdout R2 under LOW_CONF_R2 = the UI shows "low confidence" on that position's stat scores
+    confidence: Object.fromEntries(POS.map((p) => [p, report[p].h1.holdout.r2 < LOW_CONF_R2 ? "low" : "ok"])), lowConfidenceR2: LOW_CONF_R2,
     cliffModel: { priorStrengthK: K_BEST === Infinity ? null : K_BEST, rollingLogLoss: Object.fromEntries(K_GRID.map((K) => [String(K), round(kLoss[K] / kN, 4)])), rollingN: kN, cliffRatio: CLIFF_RATIO, cliffPPGFrac: CLIFF_PPG_FRAC, harstadTable: HARSTAD, trainRows: Object.fromEntries(POS.map((p) => [p, cliffTrain[p].length])), observedCliffRate: Object.fromEntries(POS.map((p) => [p, round(mean(cliffTrain[p].map((r) => r.y)), 3)])) },
   },
   ageCurves,

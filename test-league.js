@@ -1,11 +1,12 @@
-// node test-league.js [leagueId] : live Sleeper league import, power table, title odds, chips, sample trade.
+// node test-league.js <leagueId> : live Sleeper league import, power table, title odds, chips, sample trade.
 // LEAGUE=<id> ME=<display_name> N=<sims> node test-league.js
 const League = require("./league.js"), Sim = require("./sim.js");
 const values = require("./data/values.json");
 const ok = (c, m) => { if (!c) { console.error("FAIL", m); process.exitCode = 1; } else console.log("ok  ", m); };
 const pct = (x) => (100 * x).toFixed(1).padStart(5) + "%";
 (async () => {
-  const id = process.argv[2] || process.env.LEAGUE || "", N = +(process.env.N || 10000);
+  const id = process.argv[2] || process.env.LEAGUE, N = +(process.env.N || 10000);
+  if (!id) { console.error("usage: node test-league.js <sleeperLeagueId>  (or LEAGUE=<id>). The ID is the number in your Sleeper league URL."); process.exit(2); }
   const all = await fetch("https://api.sleeper.app/v1/players/nfl").then((r) => r.json());
   const players = {}; Object.entries(all).forEach(([k, p]) => { if (p.position) players[k] = { name: p.full_name || [p.first_name, p.last_name].join(" "), pos: p.position, age: p.age, team: p.team, injury: p.injury_status }; });
   const L = await League.load(id, { players });
@@ -15,7 +16,7 @@ const pct = (x) => (100 * x).toFixed(1).padStart(5) + "%";
   ok(L.schedule.length === L.weeks.length && L.schedule.every((g) => g.length === L.numTeams / 2), "every remaining week has a full set of matchups");
   ok(L.picks.length === 3 * (L.settings.draft_rounds || 4) * L.numTeams, "pick table complete: " + L.picks.length);
   ok(L.picks.every((p) => L.teams.some((t) => t.rid === p.owner)), "every pick has a valid owner");
-  const me = L.teams.find((t) => t.owner === (process.env.ME || "BJepp")) || L.teams[0];
+  const me = L.teams.find((t) => t.owner === process.env.ME) || L.teams[0];
   console.log("My team:", me.owner, "roster", me.rid, `(${me.w}-${me.l})`);
 
   // scoring spot check: a hand-computed line

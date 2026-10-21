@@ -28,27 +28,39 @@
     });
     list.sort((a, b) => b.market - a.market);
     picks.sort((a, b) => a.name.localeCompare(b.name));
+    // Survival reference per position: 75th percentile of P(still a regular in 3 seasons).
+    // A rebuilder only keeps market value that lasts, so market is scaled by survival / this reference.
+    const survRef = {};
+    POS.forEach((pos) => {
+      const xs = list.filter((p) => p.pos === pos && p.st && p.st.survival).map((p) => p.st.survival[2]).sort((a, b) => a - b);
+      survRef[pos] = xs.length ? xs[Math.floor(0.75 * (xs.length - 1))] : 1;
+    });
     const byId = {}; list.concat(picks).forEach((p) => (byId[p.id] = p));
-    return { list, picks, byId, fmt: raw.fmt, generated: raw.values.generated, sources: raw.values.sources, statsMeta: raw.stats && raw.stats.meta };
+    return { list, picks, byId, survRef, fmt: raw.fmt, generated: raw.values.generated, sources: raw.values.sources, statsMeta: raw.stats && raw.stats.meta };
   }
 
   function analyze(db, id) {
     const p = db.byId[String(id)];
     if (!p) return null;
     const overall = {};
-    let now = null, long = null;
+    let now = null, long = null, persist = 1;
     const hasStats = !!(p.st && p.st.statScoreNow != null);
     if (p.isPick) TYPES.forEach((k) => (overall[k] = clamp(p.market + PICK_ADJ[k])));
     else {
       if (hasStats) { now = p.st.statScoreNow; long = p.st.statScoreLong; }
+      // persistence: 1 for a typical young starter, near 0 for a player unlikely to last 3 seasons
+      persist = hasStats && p.st.survival ? clamp(p.st.survival[2] / (db.survRef[p.pos] || 1), 0, 1) : 1;
+      const mkt = { Contender: p.market, Retooler: p.market * (1 + persist) / 2, Rebuilder: p.market * persist };
       TYPES.forEach((k) => {
         const stats = hasStats ? W[k].now * now + (1 - W[k].now) * long : null;
-        overall[k] = hasStats ? W[k].m * p.market + (1 - W[k].m) * stats : p.market;
+        overall[k] = hasStats ? W[k].m * mkt[k] + (1 - W[k].m) * stats : p.market;
       });
       overall.Contender = clamp(overall.Contender - (INJ[(p.injury || "").toLowerCase()] || 0));
     }
     const d = overall.Contender - overall.Rebuilder;
     let archetype = d > 5 ? "Contender" : d < -5 ? "Rebuilder" : "Retooler";
+    // Aging asset (under 65% of the typical 3-season survival at its position): its only use is now.
+    if (persist < 0.65) archetype = "Contender";
     if (TYPES.every((k) => overall[k] >= 85)) archetype = "Core";
     const surv = hasStats ? p.st.survival || [] : [];
     let tag = { Contender: "Buy for contenders", Rebuilder: "Rebuilder stash", Retooler: "Hold", Core: "Core hold for anyone" }[archetype];

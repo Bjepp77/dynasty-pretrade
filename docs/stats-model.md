@@ -44,7 +44,38 @@ Limits: the curve is conditional on the other features (a 28-year-old RB with bi
 - `players[sleeper_id] = {name, pos, age, projPPG1, projPPG2, projPPG3, statScoreNow, statScoreLong, components}`. Age is current (as of the run date).
 - Scale: `score = 100 x Phi(z)`, where z compares the value to the mean and spread of the position's starter pool (top 12 QB, 24 RB, 36 WR, 12 TE by the same metric). 50 is an average starter; elite players approach but do not hard-cap at 100 (about 2.5+ standard deviations above the pool average gives 99+).
 - `statScoreNow`: that scale applied to projPPG1.
-- `statScoreLong`: that scale applied to `longPPG` = sum over k=1..3 of 0.9^(k-1) x survival_k x projPPG_k. `survival` (in each player) is P(player has 8+ games in season Y+k), a per-position logistic in age (linear plus a hinge at 30), fitted by IRLS on fantasy-relevant players (top 2x the starter pool by PPG, 6+ games) from 2018 onward. It is exported as `survivalCurves` (ages 21-38, k1..k3). Departure risk is therefore priced in twice for h>=2 (the departed-player floor in the training target, and the survival weight); that is deliberate, it keeps old players low. Survival at ages 36+ rests on very few players, so treat those points as rough. Check: Henry (RB, 32.8) longPPG 13.5, long score 2; Kelce 0.1; Rodgers 0; Allen 75; McCaffrey (30.4) 49.
+- `statScoreLong`: that scale applied to `longPPG` = availability x sum over k=1..3 of 0.9^(k-1) x expPPG_k (see "Cliff hazard and availability" below). The old survival (P of 8+ games in Y+k) mixed injuries and benchings with age decline and was too flat against published age-hazard tables; it is replaced.
+- `survival[k-1]` = P(no cliff in the next k seasons) = product of (1 - `cliffHazard`). `cliffHazard[k-1]` = annual hazard at age+k-1. `availability` = expected games-played fraction. Also per player: `projPPGNoCliff` (PPG if no cliff, from separate ridge models) and `expPPG`. `projPPG1/2/3` are unchanged (the original ridge projections, still what the UI shows).
+
+## Cliff hazard and availability
+Split into two parts so that injuries no longer look like aging.
+
+**Cliff hazard h(pos, age)** = P(career cliff next season). Cliff = next-season PPG below 60% of this season's PPG, or the player is out of the league (no row in any later season, confirmed by one extra year of data).
+- Sample: fantasy-relevant players (top 2x the starter pool by PPG, 6+ games), feature seasons 2018-2024. Rows are excluded when ambiguous: next season played under 6 games, a missed year followed by a return, or an absence in the last data year. Rows: QB 147, RB 296, WR 464, TE 158; observed cliff rates 4%, 22%, 20%, 22%.
+- Empirical fit: logistic in age with a slope below 26 and hinges at 26 and 30 (IRLS plus light ridge), forced monotone non-decreasing from 26 up. It is noisy at old ages (RB 32+ has under 10 rows).
+- Prior: the published Harstad age-hazard table (QB/RB/WR/TE at 24, 26, 27, 30, 32, 33, 34; linear between, last slope continued past 34, capped 0.97, flat below 24).
+- Blend (empirical-Bayes shrink): h = w x fit + (1 - w) x Harstad, w = n/(n + K). n = local sample size at that age (triangular kernel, +-2 years), K = 50 prior pseudo-observations. K was chosen by rolling-origin log-loss (fit on feature years before t, score year t, t = 2021-2024, all positions): K=0 (fit only) 0.464, 10 0.451, 25 0.448, **50 0.446**, 100 0.447, 500 0.452, infinity (Harstad only) 0.455. The blend beats both extremes. Where data are plentiful (WR/RB at 23-28) w is 0.5-0.7; at 32+ it is 0.04-0.3 and the Harstad shape dominates. The blend is re-forced monotone from 26.
+- Result (blended hazard, fit-only and Harstad in `cliffCurves`):
+
+| Age | QB fit / H / blend | RB | WR | TE |
+|---|---|---|---|---|
+| 24 | .019 / .010 / .013 | .157 / .070 / .128 | .149 / .070 / .126 | .178 / .110 / .136 |
+| 27 | .057 / .020 / .032 | .282 / .150 / .221 | .211 / .140 / .187 | .193 / .170 / .179 |
+| 30 | .057 / .050 / .052 | .414 / .330 / .353 | .262 / .240 / .250 | .193 / .230 / .219 |
+| 32 | .057 / .085 / .079 | .521 / .550 / .547 | .379 / .330 / .344 | .303 / .270 / .277 |
+| 34 | .057 / .140 / .125 | .627 / .900 / .888 | .513 / .440 / .451 | .461 / .350 / .369 |
+
+Data are higher than Harstad for young RB/WR (24: 15-16% vs 7%) because the 60%-of-prior-PPG rule also catches lost jobs and mid-career role changes; the blend splits the difference. The QB fit is flat after 26 (6 cliffs in 147 rows), so the QB blend after 30 is mostly Harstad.
+
+**Availability a(pos)** = expected share of 17 games played, among fantasy-relevant players still in the league. Miss rate = 1 - games/17. Baseline = miss rate after a season with 10+ games: QB 21.6%, RB 24.8%, WR 22.2%, TE 23.8% (availability 0.78/0.75/0.78/0.76). Multiplied by 1.33 if the player missed 8+ games last year (spec value; the data say QB 2.45 on 17 rows, RB 1.51, WR 1.59, TE 1.06 on 13, so 1.33 is mid-range, not fitted). Age uplift on the miss rate: RB 29+ and TE 32+, shrunk empirical ratio toward a 1.15 judgment prior (RB raw 1.15 on 24 rows, used 1.15; TE raw 0.99 on 13 rows, used 1.10). The same `availability` scales all three years. Full numbers in `data/stats.json` under `availability`.
+
+**Projection**
+- `projPPGNoCliff_k`: ridge models with the same features as the main ones, trained only on players who never cliffed on the way to Y+k (each season 6+ games and PPG at least 60% of the previous one). No imputed departure floor here, because the cliff probability is carried by survival instead, so departure risk is no longer priced twice.
+- `expPPG_k = S_k x PPGnoCliff_k + (1 - S_k) x 0.5 x PPGnoCliff_k`. Applied for k = 1, 2, 3 (the spec named k = 2 and 3; k = 1 is included because the h=1 model's targets need 6+ games and so carry no departure risk).
+- `longPPG = availability x sum_k 0.9^(k-1) x expPPG_k`. `statScoreLong = 100 x Phi(z)` against the top-N pool by longPPG, as before.
+- The holdout metrics below are for the unchanged `projPPG` models and did not move.
+- Checks (long score before to after): Henry (RB 32.8) 2.3 to 2.5, survival 0.711/0.382/0.114 to 0.488/0.174/0.031; McCaffrey 49.2 to 43.0; Kelce 0.1 to 2.1; Josh Allen 75.5 to 98.4 (QB survival 0.78/0.72/0.68 to 0.95/0.90/0.84); Gibbs 98.9 to 98.7.
+- Limits: the "0.5 x" cliff share is a constant, not fitted. Age is on Sep 1 of the feature season for both the fit and Harstad lookups; Harstad's own age convention may differ by up to a year. Hazards at 35+ are essentially the prior.
 - `components`: PPG contribution of each feature group in the h=1 model (`baseline`, `recentProduction`, `usage`, `efficiency`, `availability`, `age`), the raw `metrics` used, and `gamesLastSeason`.
 - `ageCurves`, and `meta.holdout` (all R2/MAE numbers).
 - Projections are PPG only, with no injury or availability-risk weighting beyond the games-played features. They do not use team context, depth chart, rookies, or draft capital.

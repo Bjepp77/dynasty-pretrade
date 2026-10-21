@@ -17,6 +17,9 @@ const LAST_YEAR = 2025; // last complete regular season
 const TRAIN_FIRST = 2018; // first feature season used for training
 const HOLD_YEAR = 2025; // holdout target season (h=1: features 2024)
 const HORIZONS = [1, 2, 3];
+const CLIFF_RATIO = 0.6; // cliff = next-season PPG below this share of this season's PPG (or out of the league)
+const CLIFF_PPG_FRAC = 0.5; // PPG kept, as a share of the no-cliff projection, if a cliff happens
+const MISS_MULT = 1.33; // miss-rate multiplier after a season with 8+ games missed (from the spec; the data check is printed)
 const DISCOUNT = 0.9; // per-year discount for the 3-year sum
 const MIN_GP_FEAT = 3; // feature season needs >= this many games
 const MIN_GP_TARGET = 6; // target season needs >= this many games
@@ -175,14 +178,25 @@ function targetFor(r, h) {
   if (h >= 2 && !t && (lastSeen.get(r.id) || 0) < r.year + h && r.year + h <= LAST_YEAR) return floorPPG[r.pos]; // gone from the league
   return NaN;
 }
-function samples(pos, h, yFrom, yTo) {
+// noCliff = true: only players who never cliffed on the way to Y+h (every season has 6+ games and PPG >= CLIFF_RATIO x the
+// season before). No imputed departures. This is the "PPG if he is still productive" target used with survival.
+function noCliffTarget(r, h) {
+  let prev = r.ppg;
+  for (let j = 1; j <= h; j++) {
+    const t = season.get(r.id + "|" + (r.year + j));
+    if (!t || t.games < MIN_GP_TARGET || t.ppg < CLIFF_RATIO * prev) return NaN;
+    prev = t.ppg;
+  }
+  return prev;
+}
+function samples(pos, h, yFrom, yTo, noCliff = false) {
   const out = [];
   for (let y = yFrom; y <= yTo; y++) {
     for (const r of season.values()) {
       if (r.year !== y || r.pos !== pos || r.games < MIN_GP_FEAT) continue;
       const birth = birthOf(r.id);
       if (!birth) continue;
-      const t = targetFor(r, h);
+      const t = noCliff ? noCliffTarget(r, h) : targetFor(r, h);
       if (!Number.isFinite(t)) continue;
       out.push({ ...featRow(r), age: ageAt(birth, y), target: t });
     }
@@ -262,34 +276,148 @@ for (const pos of POS) {
   final[pos] = {};
   for (const h of HORIZONS) final[pos][h] = fit(pos, samples(pos, h, TRAIN_FIRST, LAST_YEAR - h));
 }
-// survival: P(player has >= 8 games in year Y+k | pos, age at Y), logistic in age (linear + hinge at 30), fitted by IRLS.
-// Sample: fantasy-relevant players only (top 2x the starter pool by PPG among 6+ game seasons), otherwise fringe churn
-// dominates. Missing the later season (retired, cut, injured out) counts as 0.
-const surv = {};
-const sfeat = (a) => [1, a - 28, Math.max(0, a - 30)];
+const finalNC = {}; // same features, trained only on players who stayed productive (the no-cliff branch of the projection)
 for (const pos of POS) {
-  surv[pos] = {};
-  for (const k of HORIZONS) {
-    const X = [], Y = [];
-    for (let y = TRAIN_FIRST; y <= LAST_YEAR - k; y++) {
-      const cur = [...season.values()].filter((r) => r.year === y && r.pos === pos && r.games >= 6).sort((u, v) => v.ppg - u.ppg).slice(0, POOL[pos] * 2);
-      for (const r of cur) {
-        const b = birthOf(r.id); if (!b) continue;
-        const t = season.get(r.id + "|" + (y + k));
-        X.push(sfeat(ageAt(b, y))); Y.push(t && t.games >= 8 ? 1 : 0);
-      }
+  finalNC[pos] = {};
+  for (const h of HORIZONS) finalNC[pos][h] = fit(pos, samples(pos, h, TRAIN_FIRST, LAST_YEAR - h, true));
+}
+const round = (x, d = 2) => +x.toFixed(d);
+// ---------- cliff hazard + availability ----------
+// Cliff = next season PPG < CLIFF_RATIO x this season's PPG, or the player is out of the league (no row in any later season).
+// Sample: fantasy-relevant players (top 2x the starter pool by PPG among 6+ game seasons). Excluded as ambiguous: next season
+// has a row with < 6 games, or the player is missing in Y+1 but plays later (injury / holdout), or Y+1 is the last data year
+// and the player is simply absent (could still return). "Gone" needs Y+2 <= LAST_YEAR so one extra year confirms it.
+const HARSTAD = { // annual cliff hazard by age (published Harstad age-hazard table), linearly interpolated between listed ages
+  QB: { 24: 0.01, 26: 0.02, 27: 0.02, 30: 0.05, 32: 0.085, 33: 0.11, 34: 0.14 },
+  RB: { 24: 0.07, 26: 0.12, 27: 0.15, 30: 0.33, 32: 0.55, 33: 0.70, 34: 0.90 },
+  WR: { 24: 0.07, 26: 0.11, 27: 0.14, 30: 0.24, 32: 0.33, 33: 0.38, 34: 0.44 },
+  TE: { 24: 0.11, 26: 0.15, 27: 0.17, 30: 0.23, 32: 0.27, 33: 0.28, 34: 0.35 },
+};
+function harstad(pos, age) {
+  const ks = Object.keys(HARSTAD[pos]).map(Number), t = HARSTAD[pos];
+  if (age <= ks[0]) return t[ks[0]];
+  for (let i = 1; i < ks.length; i++) if (age <= ks[i]) return t[ks[i - 1]] + ((t[ks[i]] - t[ks[i - 1]]) * (age - ks[i - 1])) / (ks[i] - ks[i - 1]);
+  const a = ks[ks.length - 2], b = ks[ks.length - 1]; // past 34: continue the last slope, capped
+  return Math.min(0.97, t[b] + ((t[b] - t[a]) / (b - a)) * (age - b));
+}
+const CLIFF_AGE_MIN = 21, CLIFF_AGE_MAX = 40;
+function cliffRows(pos, yMax) { // [{age, y}] for feature seasons TRAIN_FIRST..yMax
+  const out = [];
+  for (let y = TRAIN_FIRST; y <= Math.min(yMax, LAST_YEAR - 1); y++) {
+    const cur = [...season.values()].filter((r) => r.year === y && r.pos === pos && r.games >= 6).sort((u, v) => v.ppg - u.ppg).slice(0, POOL[pos] * 2);
+    for (const r of cur) {
+      const b = birthOf(r.id); if (!b) continue;
+      const nx = season.get(r.id + "|" + (y + 1));
+      let cliff;
+      if (nx) { if (nx.games < MIN_GP_TARGET) continue; cliff = nx.ppg < CLIFF_RATIO * r.ppg ? 1 : 0; }
+      else if ((lastSeen.get(r.id) || 0) <= y) { if (y + 2 > LAST_YEAR) continue; cliff = 1; }
+      else continue;
+      out.push({ age: ageAt(b, y), y: cliff });
     }
-    let w = [0, 0, 0];
-    for (let it = 0; it < 30; it++) {
-      const H = [[1e-3, 0, 0], [0, 1e-3, 0], [0, 0, 1e-3]], g = [0, 0, 0];
-      X.forEach((x, i) => {
-        const pr = 1 / (1 + Math.exp(-x.reduce((s2, v, j) => s2 + v * w[j], 0)));
-        for (let j = 0; j < 3; j++) { g[j] += x[j] * (Y[i] - pr); for (let l = 0; l < 3; l++) H[j][l] += x[j] * x[l] * pr * (1 - pr); }
-      });
-      const d = solve(H, g); w = w.map((v, j) => v + d[j]);
-    }
-    surv[pos][k] = (age) => 1 / (1 + Math.exp(-sfeat(Math.min(age, 40)).reduce((s2, v, j) => s2 + v * w[j], 0)));
   }
+  return out;
+}
+// logistic in age: young slope below 26, then hinge at 26 and 30; light ridge. Monotone non-decreasing from 26 on (cummax).
+const cfeat = (a) => [1, Math.min(a, 26) - 26, Math.max(0, a - 26), Math.max(0, a - 30)];
+function fitCliff(rows) {
+  const p = 4, ridgeL = 0.5;
+  let w = new Array(p).fill(0);
+  for (let it = 0; it < 40; it++) {
+    const H = Array.from({ length: p }, (_, j) => Array.from({ length: p }, (_, l) => (j === l && j > 0 ? ridgeL : j === l ? 1e-3 : 0)));
+    const g = new Array(p).fill(0);
+    rows.forEach((r) => {
+      const x = cfeat(Math.min(Math.max(r.age, CLIFF_AGE_MIN), CLIFF_AGE_MAX));
+      const pr = 1 / (1 + Math.exp(-x.reduce((s2, v, j) => s2 + v * w[j], 0)));
+      for (let j = 0; j < p; j++) { g[j] += x[j] * (r.y - pr); for (let l = 0; l < p; l++) H[j][l] += x[j] * x[l] * pr * (1 - pr); }
+    });
+    for (let j = 1; j < p; j++) g[j] -= ridgeL * w[j];
+    const d = solve(H, g); w = w.map((v, j) => v + d[j]);
+  }
+  const curve = {};
+  let run = 0;
+  for (let a = CLIFF_AGE_MIN; a <= CLIFF_AGE_MAX; a++) {
+    let v = 1 / (1 + Math.exp(-cfeat(a).reduce((s2, c, j) => s2 + c * w[j], 0)));
+    if (a >= 26) { v = Math.max(v, run); run = v; }
+    curve[a] = v;
+  }
+  return curve;
+}
+// local sample size at an age (triangular kernel, half-width 2 years); the shrink weight uses it
+const localN = (rows, a) => rows.reduce((s2, r) => s2 + Math.max(0, 1 - Math.abs(r.age - a) / 2), 0);
+function blendCurve(pos, rows, K) {
+  const fitted = fitCliff(rows), out = {};
+  let run = 0;
+  for (let a = CLIFF_AGE_MIN; a <= CLIFF_AGE_MAX; a++) {
+    const n = localN(rows, a), w = K === Infinity ? 0 : n / (n + K);
+    let v = w * fitted[a] + (1 - w) * harstad(pos, a);
+    if (a >= 26) { v = Math.max(v, run); run = v; }
+    out[a] = { fitted: fitted[a], harstad: harstad(pos, a), weight: w, n, h: Math.min(0.99, v) };
+  }
+  return out;
+}
+// pick the shrink strength K (pseudo-observations at the Harstad prior) by rolling-origin log-loss: fit on cliffs observed
+// through year t-1, score on cliffs from feature year t (t = 2021..2024), all positions pooled.
+const K_GRID = [0, 10, 25, 50, 100, 200, 500, Infinity];
+const kLoss = Object.fromEntries(K_GRID.map((K) => [K, 0]));
+let kN = 0;
+for (let t = 2021; t <= LAST_YEAR - 1; t++) for (const pos of POS) {
+  const tr = cliffRows(pos, t - 1), te = cliffRows(pos, t).slice(cliffRows(pos, t - 1).length);
+  // te = rows from feature year t only (cliffRows is ordered by year)
+  for (const K of K_GRID) {
+    const c = blendCurve(pos, tr, K);
+    for (const r of te) { const p = Math.min(0.995, Math.max(0.005, c[Math.min(CLIFF_AGE_MAX, Math.max(CLIFF_AGE_MIN, Math.round(r.age)))].h)); kLoss[K] -= r.y ? Math.log(p) : Math.log(1 - p); }
+  }
+  kN += te.length;
+}
+const K_BEST = K_GRID.reduce((b, K) => (kLoss[K] < kLoss[b] ? K : b), K_GRID[0]);
+const cliffTrain = {}, cliff = {};
+for (const pos of POS) { cliffTrain[pos] = cliffRows(pos, LAST_YEAR - 1); cliff[pos] = blendCurve(pos, cliffTrain[pos], K_BEST); }
+const hazard = (pos, age) => { // linear interpolation between integer-age points
+  const a = Math.min(CLIFF_AGE_MAX, Math.max(CLIFF_AGE_MIN, age)), lo = Math.floor(a), hi = Math.min(CLIFF_AGE_MAX, lo + 1);
+  return cliff[pos][lo].h + (cliff[pos][hi].h - cliff[pos][lo].h) * (a - lo);
+};
+// survival_k for a player of age `age` in feature season Y: prod_{j=0..k-1} (1 - h(age + j))
+const survivalK = (pos, age, k) => { let s = 1; for (let j = 0; j < k; j++) s *= 1 - hazard(pos, age + j); return s; };
+
+// availability: expected share of 17 games played next season, among fantasy-relevant players still in the league.
+// miss rate = 1 - games/17. Baseline = players who played 10+ games last season; x MISS_MULT after 8+ games missed
+// (<= 9 played); age uplift for RB 29+ and TE 32+ is the shrunk empirical ratio of miss rates (older vs younger).
+const availStats = {};
+function availRows(pos) {
+  const out = [];
+  for (let y = TRAIN_FIRST; y <= LAST_YEAR - 1; y++) {
+    const cur = [...season.values()].filter((r) => r.year === y && r.pos === pos && r.games >= 6).sort((u, v) => v.ppg - u.ppg).slice(0, POOL[pos] * 2);
+    for (const r of cur) {
+      const b = birthOf(r.id); if (!b) continue;
+      const nx = season.get(r.id + "|" + (y + 1));
+      if (!nx && (lastSeen.get(r.id) || 0) <= y) continue; // retired: that is a cliff, not availability
+      out.push({ age: ageAt(b, y), prior: Math.min(r.games, 17), miss: 1 - (nx ? Math.min(nx.games, 17) / 17 : 0) });
+    }
+  }
+  return out;
+}
+const AGE_UP = { RB: 29, TE: 32 };
+const AGE_UP_PRIOR = 1.15; // judgment prior: older RB/TE miss ~15% more games (data are thin: 24 RB and 13 TE rows)
+const availCfg = {};
+for (const pos of POS) {
+  const rows = availRows(pos), m = (a) => (a.length ? mean(a.map((r) => r.miss)) : NaN);
+  const healthy = rows.filter((r) => r.prior >= 10), hurt = rows.filter((r) => r.prior < 10);
+  const base = m(healthy);
+  let up = 1, upRaw = null, nOld = 0;
+  if (AGE_UP[pos]) {
+    const old = healthy.filter((r) => r.age >= AGE_UP[pos]), young = healthy.filter((r) => r.age < AGE_UP[pos]);
+    nOld = old.length; upRaw = m(old) / m(young);
+    up = (nOld * upRaw + 30 * AGE_UP_PRIOR) / (nOld + 30); // shrink toward the 1.15 prior with 30 pseudo-rows
+  }
+  availCfg[pos] = { baseMiss: base, up, upRaw, nOld };
+  availStats[pos] = { n: rows.length, baselineAvail: round(1 - base, 3), healthyN: healthy.length, hurtN: hurt.length, missRateAfterHealthy: round(base, 3), missRateAfter8PlusMissed: round(m(hurt), 3), empiricalMissMultiplier: round(m(hurt) / base, 2), usedMissMultiplier: MISS_MULT, ageUpliftFrom: AGE_UP[pos] || null, ageUpliftRaw: upRaw == null ? null : round(upRaw, 2), ageUpliftUsed: round(up, 2), ageUpliftN: nOld };
+}
+function availability(pos, age, gamesLast) {
+  const c = availCfg[pos];
+  let miss = c.baseMiss;
+  if (gamesLast <= 9) miss *= MISS_MULT;
+  if (AGE_UP[pos] && age >= AGE_UP[pos]) miss *= c.up;
+  return Math.min(1, Math.max(0.3, 1 - miss));
 }
 const Phi = (z) => { // normal CDF (Abramowitz-Stegun 7.1.26)
   const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z / 2);
@@ -297,7 +425,6 @@ const Phi = (z) => { // normal CDF (Abramowitz-Stegun 7.1.26)
 };
 function zscore(pool, v) { const m = mean(pool), sd = Math.sqrt(mean(pool.map((x) => (x - m) ** 2))) || 1; return (v - m) / sd; }
 const out = {}, rows = [];
-const round = (x, d = 2) => +x.toFixed(d);
 for (const r of season.values()) {
   if (r.year !== LAST_YEAR || r.games < MIN_GP_FEAT) continue;
   const rec = idByGsis.get(r.id);
@@ -316,8 +443,12 @@ for (const r of season.values()) {
   comp.metrics = Object.fromEntries(metricNames.map((f) => [f, Number.isFinite(row[f]) ? round(row[f], 3) : null]));
   comp.gamesLastSeason = r.games;
   const age = (NOW - birth) / (365.25 * 864e5);
-  const e = { name: r.name, pos: r.pos, age: round(age, 1), projPPG1: round(proj[0]), projPPG3: round(proj[2]), projPPG2: round(proj[1]), survival: HORIZONS.map((k) => round(surv[r.pos][k](row.age), 3)), _long: 0, components: comp };
-  e._long = HORIZONS.reduce((t, k, i) => t + DISCOUNT ** i * e.survival[i] * proj[i], 0); e.longPPG = round(e._long);
+  // expected PPG = S_k x PPG(no cliff) + (1 - S_k) x CLIFF_PPG_FRAC x PPG(no cliff); availability scales the sum below
+  const ncProj = HORIZONS.map((h) => Math.max(0, predRow(finalNC[r.pos][h], row)));
+  const expPPG = HORIZONS.map((k, i) => { const S = survivalK(r.pos, row.age, k); return S * ncProj[i] + (1 - S) * CLIFF_PPG_FRAC * ncProj[i]; });
+  const av = availability(r.pos, row.age, r.games);
+  const e = { name: r.name, pos: r.pos, age: round(age, 1), projPPG1: round(proj[0]), projPPG3: round(proj[2]), projPPG2: round(proj[1]), survival: HORIZONS.map((k) => round(survivalK(r.pos, row.age, k), 3)), cliffHazard: HORIZONS.map((k) => round(hazard(r.pos, row.age + k - 1), 3)), availability: round(av, 3), projPPGNoCliff: ncProj.map((x) => round(x)), expPPG: expPPG.map((x) => round(x)), _long: 0, components: comp };
+  e._long = HORIZONS.reduce((t, k, i) => t + DISCOUNT ** i * av * expPPG[i], 0); e.longPPG = round(e._long);
   out[String(rec.sleeper_id)] = e; rows.push(e);
 }
 for (const pos of POS) {
@@ -346,25 +477,42 @@ for (const pos of POS) {
   };
 }
 
-const survivalCurves = {};
+const survivalCurves = {}, cliffCurves = {};
 for (const pos of POS) {
   const ages = []; for (let a = 21; a <= 38; a++) ages.push(a);
-  survivalCurves[pos] = { ages, definition: "P(>= 8 games in season Y+k | age on Sep 1 of season Y, >= 3 games in Y)", ...Object.fromEntries(HORIZONS.map((k) => ["k" + k, ages.map((a) => round(surv[pos][k](a), 3))])) };
+  survivalCurves[pos] = { ages, definition: "P(no career cliff in the next k seasons) = prod (1 - cliffHazard), age on Sep 1 of season Y", ...Object.fromEntries(HORIZONS.map((k) => ["k" + k, ages.map((a) => round(survivalK(pos, a, k), 3))])) };
+  cliffCurves[pos] = {
+    ages, definition: "annual P(cliff next season): PPG < " + CLIFF_RATIO + " x this season's PPG, or out of the league",
+    n: ages.map((a) => round(cliff[pos][a].n, 1)), fitted: ages.map((a) => round(cliff[pos][a].fitted, 3)), harstad: ages.map((a) => round(cliff[pos][a].harstad, 3)),
+    weightOnFit: ages.map((a) => round(cliff[pos][a].weight, 2)), blended: ages.map((a) => round(cliff[pos][a].h, 3)),
+  };
 }
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify({
   meta: {
     generated: new Date().toISOString(), featureSeason: LAST_YEAR, projects: [LAST_YEAR + 1, LAST_YEAR + 2, LAST_YEAR + 3],
     discount: DISCOUNT, scoring: "PPR", source: "nflverse stats_player + snap_counts, dynastyprocess db_playerids",
-    note: "statScoreNow/Long = 100*Phi(z), z vs the position starter pool (top N by the same metric; N: " + JSON.stringify(POOL) + "). 50 = average starter. statScoreLong uses sum_k discount^(k-1) * survival_k * projPPG_k (longPPG).",
+    note: "statScoreNow/Long = 100*Phi(z), z vs the position starter pool (top N by the same metric; N: " + JSON.stringify(POOL) + "). 50 = average starter. statScoreLong uses longPPG = availability * sum_k discount^(k-1) * expPPG_k, expPPG_k = survival_k*PPGnoCliff_k + (1-survival_k)*0.5*PPGnoCliff_k; survival_k = prod(1 - cliffHazard), hazard = Harstad table blended with a nflverse logistic fit (see docs/stats-model.md).",
     holdout: report,
+    cliffModel: { priorStrengthK: K_BEST === Infinity ? null : K_BEST, rollingLogLoss: Object.fromEntries(K_GRID.map((K) => [String(K), round(kLoss[K] / kN, 4)])), rollingN: kN, cliffRatio: CLIFF_RATIO, cliffPPGFrac: CLIFF_PPG_FRAC, harstadTable: HARSTAD, trainRows: Object.fromEntries(POS.map((p) => [p, cliffTrain[p].length])), observedCliffRate: Object.fromEntries(POS.map((p) => [p, round(mean(cliffTrain[p].map((r) => r.y)), 3)])) },
   },
   ageCurves,
   survivalCurves,
+  cliffCurves,
+  availability: availStats,
   players: out,
 }, null, 1));
 
 // ---------- console summary ----------
+console.log("Cliff shrink K (rolling log-loss/row):", JSON.stringify(Object.fromEntries(K_GRID.map((K) => [K, +(kLoss[K] / kN).toFixed(4)]))), "-> K =", K_BEST);
+for (const pos of POS) {
+  console.log(pos, "cliff rows", cliffTrain[pos].length, "rate", +mean(cliffTrain[pos].map((r) => r.y)).toFixed(3));
+  for (const a of [23, 24, 26, 27, 28, 30, 32, 33, 34, 36]) {
+    const c = cliff[pos][a], q = cliffTrain[pos].filter((r) => Math.abs(r.age - a) < 1);
+    console.log(`  age ${a}: n ${c.n.toFixed(0)} emp ${q.length ? mean(q.map((r) => r.y)).toFixed(3) + " (" + q.length + ")" : "-"} fit ${c.fitted.toFixed(3)} harstad ${c.harstad.toFixed(3)} w ${c.weight.toFixed(2)} blend ${c.h.toFixed(3)}`);
+  }
+}
+console.log("availability", JSON.stringify(availStats));
 console.log("Holdout (target 2025), model vs last-year-PPG baseline:");
 for (const pos of POS) for (const h of HORIZONS) {
   const x = report[pos]["h" + h].holdout;

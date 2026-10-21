@@ -42,7 +42,9 @@ Limits: the curve is conditional on the other features (a 28-year-old RB with bi
 
 ## Output (`data/stats.json`)
 - `players[sleeper_id] = {name, pos, age, projPPG1, projPPG2, projPPG3, statScoreNow, statScoreLong, components}`. Age is current (as of the run date).
-- `statScoreNow`: 0-100 percentile of projPPG1 within position. `statScoreLong`: percentile of projPPG1 + 0.9 x projPPG2 + 0.81 x projPPG3. Percentiles are measured against the top-N fantasy-relevant pool (QB 32, RB 72, WR 96, TE 36); players below the pool score 0, so benchwarmers do not inflate scores.
+- Scale: `score = 100 x Phi(z)`, where z compares the value to the mean and spread of the position's starter pool (top 12 QB, 24 RB, 36 WR, 12 TE by the same metric). 50 is an average starter; elite players approach but do not hard-cap at 100 (about 2.5+ standard deviations above the pool average gives 99+).
+- `statScoreNow`: that scale applied to projPPG1.
+- `statScoreLong`: that scale applied to `longPPG` = sum over k=1..3 of 0.9^(k-1) x survival_k x projPPG_k. `survival` (in each player) is P(player has 8+ games in season Y+k), a per-position logistic in age (linear plus a hinge at 30), fitted by IRLS on fantasy-relevant players (top 2x the starter pool by PPG, 6+ games) from 2018 onward. It is exported as `survivalCurves` (ages 21-38, k1..k3). Departure risk is therefore priced in twice for h>=2 (the departed-player floor in the training target, and the survival weight); that is deliberate, it keeps old players low. Survival at ages 36+ rests on very few players, so treat those points as rough. Check: Henry (RB, 32.8) longPPG 13.5, long score 2; Kelce 0.1; Rodgers 0; Allen 75; McCaffrey (30.4) 49.
 - `components`: PPG contribution of each feature group in the h=1 model (`baseline`, `recentProduction`, `usage`, `efficiency`, `availability`, `age`), the raw `metrics` used, and `gamesLastSeason`.
 - `ageCurves`, and `meta.holdout` (all R2/MAE numbers).
 - Projections are PPG only, with no injury or availability-risk weighting beyond the games-played features. They do not use team context, depth chart, rookies, or draft capital.

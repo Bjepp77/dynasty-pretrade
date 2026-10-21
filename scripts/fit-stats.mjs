@@ -21,7 +21,7 @@ const DISCOUNT = 0.9; // per-year discount for the 3-year sum
 const MIN_GP_FEAT = 3; // feature season needs >= this many games
 const MIN_GP_TARGET = 6; // target season needs >= this many games
 const POS = ["QB", "RB", "WR", "TE"];
-const POOL = { QB: 32, RB: 72, WR: 96, TE: 36 }; // fantasy-relevant pool for percentiles
+const POOL = { QB: 12, RB: 24, WR: 36, TE: 12 }; // starter pool (z-score reference) per position
 const AGE_KNOTS = [24, 27, 29, 31, 33]; // hinge knots for the piecewise-linear age effect
 const LAMBDAS = [0.3, 1, 3, 10, 30, 100, 300, 1000];
 const NOW = new Date("2026-10-21T00:00:00Z"); // model-age reference is Sep 1 of the feature season
@@ -262,7 +262,40 @@ for (const pos of POS) {
   final[pos] = {};
   for (const h of HORIZONS) final[pos][h] = fit(pos, samples(pos, h, TRAIN_FIRST, LAST_YEAR - h));
 }
-const pctile = (pool, v) => (100 * pool.filter((x) => x < v).length) / pool.length;
+// survival: P(player has >= 8 games in year Y+k | pos, age at Y), logistic in age (linear + hinge at 30), fitted by IRLS.
+// Sample: fantasy-relevant players only (top 2x the starter pool by PPG among 6+ game seasons), otherwise fringe churn
+// dominates. Missing the later season (retired, cut, injured out) counts as 0.
+const surv = {};
+const sfeat = (a) => [1, a - 28, Math.max(0, a - 30)];
+for (const pos of POS) {
+  surv[pos] = {};
+  for (const k of HORIZONS) {
+    const X = [], Y = [];
+    for (let y = TRAIN_FIRST; y <= LAST_YEAR - k; y++) {
+      const cur = [...season.values()].filter((r) => r.year === y && r.pos === pos && r.games >= 6).sort((u, v) => v.ppg - u.ppg).slice(0, POOL[pos] * 2);
+      for (const r of cur) {
+        const b = birthOf(r.id); if (!b) continue;
+        const t = season.get(r.id + "|" + (y + k));
+        X.push(sfeat(ageAt(b, y))); Y.push(t && t.games >= 8 ? 1 : 0);
+      }
+    }
+    let w = [0, 0, 0];
+    for (let it = 0; it < 30; it++) {
+      const H = [[1e-3, 0, 0], [0, 1e-3, 0], [0, 0, 1e-3]], g = [0, 0, 0];
+      X.forEach((x, i) => {
+        const pr = 1 / (1 + Math.exp(-x.reduce((s2, v, j) => s2 + v * w[j], 0)));
+        for (let j = 0; j < 3; j++) { g[j] += x[j] * (Y[i] - pr); for (let l = 0; l < 3; l++) H[j][l] += x[j] * x[l] * pr * (1 - pr); }
+      });
+      const d = solve(H, g); w = w.map((v, j) => v + d[j]);
+    }
+    surv[pos][k] = (age) => 1 / (1 + Math.exp(-sfeat(Math.min(age, 40)).reduce((s2, v, j) => s2 + v * w[j], 0)));
+  }
+}
+const Phi = (z) => { // normal CDF (Abramowitz-Stegun 7.1.26)
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z / 2);
+  return z >= 0 ? 0.5 * (1 + y) : 0.5 * (1 - y);
+};
+function zscore(pool, v) { const m = mean(pool), sd = Math.sqrt(mean(pool.map((x) => (x - m) ** 2))) || 1; return (v - m) / sd; }
 const out = {}, rows = [];
 const round = (x, d = 2) => +x.toFixed(d);
 for (const r of season.values()) {
@@ -283,14 +316,15 @@ for (const r of season.values()) {
   comp.metrics = Object.fromEntries(metricNames.map((f) => [f, Number.isFinite(row[f]) ? round(row[f], 3) : null]));
   comp.gamesLastSeason = r.games;
   const age = (NOW - birth) / (365.25 * 864e5);
-  const e = { name: r.name, pos: r.pos, age: round(age, 1), projPPG1: round(proj[0]), projPPG3: round(proj[2]), projPPG2: round(proj[1]), _long: proj[0] + DISCOUNT * proj[1] + DISCOUNT ** 2 * proj[2], components: comp };
+  const e = { name: r.name, pos: r.pos, age: round(age, 1), projPPG1: round(proj[0]), projPPG3: round(proj[2]), projPPG2: round(proj[1]), survival: HORIZONS.map((k) => round(surv[r.pos][k](row.age), 3)), _long: 0, components: comp };
+  e._long = HORIZONS.reduce((t, k, i) => t + DISCOUNT ** i * e.survival[i] * proj[i], 0); e.longPPG = round(e._long);
   out[String(rec.sleeper_id)] = e; rows.push(e);
 }
 for (const pos of POS) {
   const list = rows.filter((e) => e.pos === pos);
   const poolNow = [...list].sort((a, b) => b.projPPG1 - a.projPPG1).slice(0, POOL[pos]).map((e) => e.projPPG1);
   const poolLong = [...list].sort((a, b) => b._long - a._long).slice(0, POOL[pos]).map((e) => e._long);
-  list.forEach((e) => { e.statScoreNow = round(pctile(poolNow, e.projPPG1), 1); e.statScoreLong = round(pctile(poolLong, e._long), 1); });
+  list.forEach((e) => { e.statScoreNow = round(100 * Phi(zscore(poolNow, e.projPPG1)), 1); e.statScoreLong = round(100 * Phi(zscore(poolLong, e._long)), 1); });
 }
 rows.forEach((e) => delete e._long);
 
@@ -312,15 +346,21 @@ for (const pos of POS) {
   };
 }
 
+const survivalCurves = {};
+for (const pos of POS) {
+  const ages = []; for (let a = 21; a <= 38; a++) ages.push(a);
+  survivalCurves[pos] = { ages, definition: "P(>= 8 games in season Y+k | age on Sep 1 of season Y, >= 3 games in Y)", ...Object.fromEntries(HORIZONS.map((k) => ["k" + k, ages.map((a) => round(surv[pos][k](a), 3))])) };
+}
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify({
   meta: {
     generated: new Date().toISOString(), featureSeason: LAST_YEAR, projects: [LAST_YEAR + 1, LAST_YEAR + 2, LAST_YEAR + 3],
     discount: DISCOUNT, scoring: "PPR", source: "nflverse stats_player + snap_counts, dynastyprocess db_playerids",
-    note: "statScoreNow/Long are percentiles vs the top-N fantasy-relevant pool at the position (N: " + JSON.stringify(POOL) + "); players below the pool score 0.",
+    note: "statScoreNow/Long = 100*Phi(z), z vs the position starter pool (top N by the same metric; N: " + JSON.stringify(POOL) + "). 50 = average starter. statScoreLong uses sum_k discount^(k-1) * survival_k * projPPG_k (longPPG).",
     holdout: report,
   },
   ageCurves,
+  survivalCurves,
   players: out,
 }, null, 1));
 
@@ -332,6 +372,6 @@ for (const pos of POS) for (const h of HORIZONS) {
 }
 for (const key of ["statScoreNow", "statScoreLong"]) {
   console.log(`\nTop 10 ${key}:`);
-  [...rows].sort((a, b) => b[key] - a[key] || b.projPPG1 - a.projPPG1).slice(0, 10).forEach((e) => console.log(`  ${e.name} ${e.pos} age ${e.age} ppg1 ${e.projPPG1} ppg3 ${e.projPPG3} now ${e.statScoreNow} long ${e.statScoreLong}`));
+  [...rows].sort((a, b) => b[key] - a[key] || b.projPPG1 - a.projPPG1).slice(0, 10).forEach((e) => console.log(`  ${e.name} ${e.pos} age ${e.age} ppg1/2/3 ${e.projPPG1}/${e.projPPG2}/${e.projPPG3} surv ${e.survival.join("/")} longPPG ${e.longPPG} now ${e.statScoreNow} long ${e.statScoreLong}`));
 }
 console.log(`\nwrote ${OUT}: ${rows.length} players`);

@@ -99,7 +99,7 @@
     return { p, overall, fit: overall, market: p.market, now, long, hasStats, archetype, tag, explanation, trend: p.trend, trendHint: trendHint(p) };
   }
 
-  // Trade: each asset's aggregate value is scaled by its overall score for the team type, then each side is
+  // Trade: each asset's aggregate value is scaled by (0.5 + overall/100) / (0.5 + market/100) for the team type, then each side is
   // consolidated with the power-sum. total/rawAdj = plain sums, cons/adj = consolidated. The verdict per team
   // type uses the consolidated values: pct = |A - B| / mean(A, B), mapped to a band.
   function analyzeTrade(db, aIds, bIds) {
@@ -109,7 +109,8 @@
       const total = vals.reduce((s, v) => s + v, 0), cons = consolidate(vals);
       const adj = {}, rawAdj = {};
       TYPES.forEach((k) => {
-        const sc = rs.map((r) => r.p.value * (0.5 + r.overall[k] / 100));
+        // fit relative to market: value already prices the market, so only the team type's deviation from it counts
+        const sc = rs.map((r) => r.p.value * (0.5 + r.overall[k] / 100) / (0.5 + r.p.market / 100));
         rawAdj[k] = sc.reduce((s, v) => s + v, 0); adj[k] = consolidate(sc);
       });
       return { rs, total, cons, adj, rawAdj };

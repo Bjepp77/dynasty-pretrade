@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dynasty Pre-Trade Analyzer</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Dynasty Pre-Trade Analyzer</h1><p class="sub">Which kind of dynasty team is this player worth the most to?</p>
+<nav><button id="tabSingle" class="on">Player</button><button id="tabTrade">Trade</button></nav>
+<div id="status" class="status">Loading live data...</div></header>
+<main>
+<section id="single"><div class="pick"><input id="q" placeholder="Search a player (e.g. Ja'Marr Chase)" autocomplete="off"><div class="ac" id="ac"></div></div><div id="out"></div></section>
+<section id="trade" hidden>
+ <div class="sides">
+  <div class="side"><h3>Side A <small>(players you'd receive)</small></h3><div class="pick"><input id="qa" placeholder="Add player to A" autocomplete="off"><div class="ac" id="aca"></div></div><ul id="la"></ul></div>
+  <div class="side"><h3>Side B <small>(players they'd give / other side)</small></h3><div class="pick"><input id="qb" placeholder="Add player to B" autocomplete="off"><div class="ac" id="acb"></div></div><ul id="lb"></ul></div>
+ </div><div id="tout"></div>
+</section>
+</main>
+<footer>Values: FantasyCalc (live). Players/stats: Sleeper (live). Strength of schedule: <b>demo estimate</b>, not live. Not financial advice, it is fantasy football.</footer>
+<script src="data/sos.js"></script><script src="scoring.js"></script><script src="app.js"></script>
+</body></html>

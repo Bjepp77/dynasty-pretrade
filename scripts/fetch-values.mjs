@@ -45,6 +45,8 @@ async function get(url, kind = "json") {
   if (!r.ok) throw new Error(`${r.status} ${url}`);
   return kind === "json" ? r.json() : r.text();
 }
+// Percent change over 30 days from an absolute change (FantasyCalc trend30Day) or a prior value (Dynasty Daddy).
+const pctChange = (now, before) => (before > 0 && now != null ? Math.max(-100, Math.min(300, ((now - before) / before) * 100)) : null);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function parseCsv(text) {
@@ -89,14 +91,14 @@ async function srcFantasyCalc() {
       for (const r of j) {
         const p = r.player; if (!p) continue;
         if (p.position === "PICK") {
-          const id = pickId(p.name); if (id) out.push({ id, name: pickName(id), pos: "PICK", value: r.value });
+          const id = pickId(p.name); if (id) out.push({ id, name: pickName(id), pos: "PICK", value: r.value, trend: pctChange(r.value, r.value - (r.trend30Day || 0)) });
           continue;
         }
         if (!SKILL.has(p.position)) continue;
         rows++;
         if (!p.sleeperId) continue;
         matched++;
-        out.push({ id: String(p.sleeperId), name: p.name, pos: p.position, value: r.value });
+        out.push({ id: String(p.sleeperId), name: p.name, pos: p.position, value: r.value, trend: pctChange(r.value, r.value - (r.trend30Day || 0)) });
       }
       byFmt.set(f.key, out);
     } catch (e) { fails++; lastErr = e.message; log("fantasycalc", f.key, e.message); }
@@ -115,12 +117,13 @@ async function srcDynastyDaddy() {
     for (const r of j) {
       const v = sf ? r.sf_trade_value : r.trade_value;
       if (v == null) continue;
-      if (r.position === "PI") { const id = pickId(r.full_name); if (id) out.push({ id, name: pickName(id), pos: "PICK", value: v }); continue; }
+      const tr = pctChange(v, Number(sf ? r.last_month_value_sf : r.last_month_value) || 0);
+      if (r.position === "PI") { const id = pickId(r.full_name); if (id) out.push({ id, name: pickName(id), pos: "PICK", value: v, trend: tr }); continue; }
       if (!SKILL.has(r.position)) continue;
       rows++;
       if (!r.sleeper_id) continue;
       matched++;
-      out.push({ id: String(r.sleeper_id), name: r.full_name || r.name_id, pos: r.position, value: v });
+      out.push({ id: String(r.sleeper_id), name: r.full_name || r.name_id, pos: r.position, value: v, trend: tr });
     }
     return { out, rows, matched };
   };
@@ -248,6 +251,7 @@ function aggregate(fmt, srcData, coverage) {
       if (!p) per.set(e.id, (p = { name: e.name, pos: e.pos, items: [], pri: key === "fc" ? 0 : key === "dd" ? 1 : key === "dp" ? 2 : 3 }));
       if (key === "fc" || (key === "dd" && p.pri > 1) || (key === "dp" && p.pri > 2)) { p.name = e.name; p.pos = e.pos; p.pri = key === "fc" ? 0 : key === "dd" ? 1 : 2; }
       p.items.push({ key, v, score, w, x: v });
+      if (e.trend != null && Number.isFinite(e.trend)) (p.trends || (p.trends = [])).push(e.trend); // fc and dd only
     }
   }
   const out = {};
@@ -260,6 +264,8 @@ function aggregate(fmt, srcData, coverage) {
     out[id] = {
       name: p.name, pos: p.pos, marketScore: r1(marketScore), aggValue: Math.round(aggValue), n: items.length,
       spread: spread == null ? null : r1(spread), by: Object.fromEntries(items.map((i) => [i.key, r1(i.score)])),
+      // 30-day change in market value, %: mean of the FantasyCalc and Dynasty Daddy trends that exist; null if neither
+      trend30: p.trends && p.trends.length ? r1(p.trends.reduce((a, b) => a + b, 0) / p.trends.length) : null,
     };
   }
   return out; // JSON objects reorder integer-like keys, so no sort here; consumers sort by marketScore

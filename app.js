@@ -48,6 +48,10 @@ function ac(input, box, onPick, withPicks) {
 }
 const bar = (label, v, w) => `<div class="bar"><span>${label}</span><div class="track"><div class="fill ${w ? "w" : ""}" style="width:${Math.round(v)}%"></div></div><b>${Math.round(v)}</b></div>`;
 
+// 30-day market trend: "▲ 12.3%" / "▼ 4.0%", empty when unknown
+const trendTxt = (t) => (t == null ? "" : `<span class="${t >= 0 ? "up" : "down"}">${t >= 0 ? "▲" : "▼"} ${Math.abs(t).toFixed(1)}%</span>`);
+const hintTag = (r) => (r.trendHint ? `<span class="tag ${r.trend > 0 ? "rising" : "falling"}">${r.trendHint}</span>` : "");
+
 function card(r) {
   const p = r.p, st = p.st, o = r.overall;
   const big = DPT.TYPES.map((k) => `<div><small>${k}</small><b>${Math.round(o[k])}</b></div>`).join("");
@@ -58,10 +62,11 @@ function card(r) {
     Chance still a regular: ${st.survival.map((x) => Math.round(100 * x) + "%").join(" / ")}.<br>Last season ${st.components.metrics.ppg.toFixed(1)} PPG in ${st.components.gamesLastSeason} games.</div>`
     : `<h4>Stats model</h4><p class="meta">No NFL stats yet (rookie or no recent games). Overall = market score only.</p>`;
   return `<div class="card"><div class="top"><div><h2>${p.name}</h2><div class="meta">${p.isPick ? "Draft pick" : `${p.pos} · ${p.team} · age ${p.age ? p.age.toFixed(1) : "?"} · yr ${p.exp ?? "?"} · ${p.injury || "healthy"} · depth ${p.depth ?? "n/a"}`}</div></div>
-  <div style="text-align:right"><span class="badge ${r.archetype}">${DPT.LABEL[r.archetype]}</span><br><span class="tag">${r.tag}</span></div></div>
+  <div style="text-align:right"><span class="badge ${r.archetype}">${DPT.LABEL[r.archetype]}</span><br><span class="tag">${r.tag}</span>${r.trendHint ? "<br>" + hintTag(r) : ""}</div></div>
   <h4>Overall score by team type (0-100)</h4><div class="verdict">${big}</div>
   <p class="exp">${r.explanation}</p>
-  <div class="pair"><div><h4>Market ${Math.round(p.market)} <small>(${p.n} sources${p.spread != null ? ", spread " + p.spread.toFixed(1) : ""})</small></h4>${srcBars}</div>
+  <div class="pair"><div><h4>Market ${Math.round(p.market)} <small>(${p.n} sources${p.spread != null ? ", spread " + p.spread.toFixed(1) : ""})</small></h4>${srcBars}
+  <div class="meta">30-day trend: ${p.trend == null ? "n/a" : trendTxt(p.trend)}</div></div>
   <div>${statsCol}</div></div></div>`;
 }
 
@@ -69,17 +74,22 @@ function showSingle(id) { $("#out").innerHTML = card(DPT.analyze(DB, id)); }
 
 function renderSide(ids, ul, arr) {
   ul.innerHTML = ""; arr.forEach((id, i) => { const p = DB.byId[id]; const li = document.createElement("li");
-    li.innerHTML = `<span>${p.name} <small>${p.isPick ? "pick" : p.pos + " " + p.team} · value ${Math.round(p.value)}</small></span>`; const b = document.createElement("button"); b.textContent = "×"; b.onclick = () => { arr.splice(i, 1); renderTrade(); }; li.appendChild(b); ul.appendChild(li); });
+    li.innerHTML = `<span>${p.name} <small>${p.isPick ? "pick" : p.pos + " " + p.team} · value ${Math.round(p.value)}</small> ${trendTxt(p.trend)}</span>`; const b = document.createElement("button"); b.textContent = "×"; b.onclick = () => { arr.splice(i, 1); renderTrade(); }; li.appendChild(b); ul.appendChild(li); });
 }
 function renderTrade() {
   renderSide(0, $("#la"), sideA); renderSide(0, $("#lb"), sideB);
   if (!sideA.length || !sideB.length) { $("#tout").innerHTML = "<p class='meta'>Add at least one player to each side.</p>"; return; }
   const t = DPT.analyzeTrade(DB, sideA, sideB);
-  const w = (k) => ({ A: "Side A", B: "Side B", Even: "Even" }[t.verdict[k].winner]);
-  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} <small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge ${r.archetype}" style="font-size:11px">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
-  $("#tout").innerHTML = `<div class="card"><h3>Verdict</h3><div class="verdict">
-   <div><small>Better for a Contender</small><b>${w("Contender")}</b></div><div><small>Better for a Retooler</small><b>${w("Retooler")}</b></div><div><small>Better for a Rebuilder</small><b>${w("Rebuilder")}</b></div></div>
-   <p class="exp">Aggregate market value: A = ${Math.round(t.A.total)}, B = ${Math.round(t.B.total)} (${t.valueWinner === "Even" ? "even" : "Side " + t.valueWinner + " ahead"}). "Better for" means the side whose players are worth more to that kind of team after weighting each asset by its overall score for that team type.</p>
+  const w = (v) => (v.winner === "Even" ? "Fair" : `Side ${v.winner}: ${v.band}`);
+  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} ${trendTxt(r.trend)} ${r.trendHint ? `<small>${r.trendHint}</small>` : ""}<br><small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge ${r.archetype}" style="font-size:11px">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
+  const n0 = (x) => Math.round(x).toLocaleString();
+  const trow = (label, a, b) => `<tr><td>${label}</td><td>${n0(a)}</td><td>${n0(b)}</td></tr>`;
+  const vk = (k) => `<div><small>Better for a ${k}</small><b>${w(t.verdict[k])}</b><small>${(100 * t.verdict[k].pct).toFixed(1)}% gap</small></div>`;
+  $("#tout").innerHTML = `<div class="card"><h3>Verdict</h3><div class="verdict">${DPT.TYPES.map(vk).join("")}</div>
+   <table class="tot"><tr><th></th><th>Side A</th><th>Side B</th></tr>
+    ${trow("Raw market total (plain sum)", t.A.total, t.B.total)}${trow("Adjusted market total (package discount)", t.A.cons, t.B.cons)}
+    ${DPT.TYPES.map((k) => trow(k + " raw (score-weighted)", t.A.rawAdj[k], t.B.rawAdj[k]) + trow(k + " adjusted", t.A.adj[k], t.B.adj[k])).join("")}</table>
+   <p class="exp">Market: ${t.market.winner === "Even" ? "fair" : "Side " + t.market.winner + " ahead, " + t.market.band.toLowerCase()} (${(100 * t.market.pct).toFixed(1)}% gap on adjusted totals). The package discount values a side as (sum of v^${DPT.CONSOL_P})^(1/${DPT.CONSOL_P}), so several small pieces are worth less than one star of the same plain sum. Gap = difference / average of the two adjusted sides: under 8.5% Fair, 8.5-17% Slight edge, 17-42.5% Clear win, over 42.5% Lopsided. Per team type, each asset is first weighted by its overall score for that type.</p>
    <div class="pair"><ul>${row(t.A)}</ul><ul>${row(t.B)}</ul></div></div>`;
 }
 

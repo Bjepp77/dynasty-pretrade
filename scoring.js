@@ -11,7 +11,24 @@
   const PICK_ADJ = { Contender: -25, Retooler: -5, Rebuilder: 10 };
   // Points off the Contender score for current injury status (hand-set).
   const INJ = { out: 12, ir: 15, pup: 12, sus: 10, doubtful: 8, questionable: 3 };
-  const clamp = (x, a = 0, b = 100) => Math.max(a, Math.min(b, x));
+  // Consolidation (package) discount: a side's value is the power-sum (sum v_i^P)^(1/P), P > 1, so many
+  // small pieces add up to less than their plain sum (roster spots, lineup slots). One asset is unchanged.
+  // P = 1.3 fitted to FantasyCalc's own trade calculator rule (docs/market-model.md): 1QB 1.31, Superflex 1.24.
+  const CONSOL_P = 1.3;
+  const consolidate = (vals, p = CONSOL_P) => Math.pow(vals.reduce((s, v) => s + Math.pow(Math.max(v, 0), p), 0), 1 / p);
+  // Fairness bands on gap / average of the two adjusted side values (upper edge exclusive).
+  const BANDS = [[0.085, "Fair"], [0.17, "Slight edge"], [0.425, "Clear win"], [Infinity, "Lopsided"]];
+  const bandOf = (pct) => BANDS.find((b) => pct < b[0])[1];
+  // 30-day market trend hint. Needs a real market value: % moves on cheap players are noise.
+  const TREND_MIN_VALUE = 1500, TREND_PCT = 10;
+  function trendHint(p) {
+    const t = p && p.trend;
+    if (t == null || !(p.value >= TREND_MIN_VALUE)) return null;
+    if (t >= TREND_PCT) return "Rising: sell high if moving";
+    if (t <= -TREND_PCT) return "Falling: buy the dip";
+    return null;
+  }
+  const clamp =(x, a = 0, b = 100) => Math.max(a, Math.min(b, x));
   const fmtKey = (qbs, ppr) => `${qbs == 2 ? "sf" : "1qb"}_${{ 1: "ppr", 0.5: "half", 0: "std" }[ppr] || "ppr"}`;
 
   // raw = {values, stats, players (slim Sleeper map), fmt}
@@ -19,7 +36,7 @@
     const vals = raw.values.formats[raw.fmt] || {}, sp = raw.players || {}, st = (raw.stats && raw.stats.players) || {};
     const list = [], picks = [];
     Object.entries(vals).forEach(([id, v]) => {
-      const base = { id, name: v.name, pos: v.pos, market: v.marketScore, value: v.aggValue, n: v.n, spread: v.spread, by: v.by || {} };
+      const base = { id, name: v.name, pos: v.pos, market: v.marketScore, value: v.aggValue, n: v.n, spread: v.spread, by: v.by || {}, trend: v.trend30 == null ? null : v.trend30 };
       if (v.pos === "PICK") return picks.push({ ...base, team: "", isPick: true });
       if (!POS.includes(v.pos)) return;
       const p = sp[id] || {}, s = st[id] || null;
@@ -79,27 +96,34 @@
           : archetype === "Rebuilder" ? " Value is in future seasons: best for a rebuilder."
           : " Balanced: fits a fringe team or holds for anyone.");
     }
-    return { p, overall, fit: overall, market: p.market, now, long, hasStats, archetype, tag, explanation };
+    return { p, overall, fit: overall, market: p.market, now, long, hasStats, archetype, tag, explanation, trend: p.trend, trendHint: trendHint(p) };
   }
 
-  // Trade: each asset's aggregate value scaled by its overall score for that team type.
+  // Trade: each asset's aggregate value is scaled by its overall score for the team type, then each side is
+  // consolidated with the power-sum. total/rawAdj = plain sums, cons/adj = consolidated. The verdict per team
+  // type uses the consolidated values: pct = |A - B| / mean(A, B), mapped to a band.
   function analyzeTrade(db, aIds, bIds) {
     const side = (ids) => {
       const rs = ids.map((i) => analyze(db, i)).filter(Boolean);
-      const total = rs.reduce((s, r) => s + r.p.value, 0);
-      const adj = {}; TYPES.forEach((k) => (adj[k] = rs.reduce((s, r) => s + r.p.value * (0.5 + r.overall[k] / 100), 0)));
-      return { rs, total, adj };
+      const vals = rs.map((r) => r.p.value);
+      const total = vals.reduce((s, v) => s + v, 0), cons = consolidate(vals);
+      const adj = {}, rawAdj = {};
+      TYPES.forEach((k) => {
+        const sc = rs.map((r) => r.p.value * (0.5 + r.overall[k] / 100));
+        rawAdj[k] = sc.reduce((s, v) => s + v, 0); adj[k] = consolidate(sc);
+      });
+      return { rs, total, cons, adj, rawAdj };
     };
     const A = side(aIds), B = side(bIds);
-    const verdict = {};
-    TYPES.forEach((k) => {
-      const d = A.adj[k] - B.adj[k];
-      verdict[k] = { winner: Math.abs(d) < 0.03 * Math.max(A.adj[k], B.adj[k], 1) ? "Even" : d > 0 ? "A" : "B", delta: d };
-    });
-    return { A, B, verdict, valueWinner: A.total === B.total ? "Even" : A.total > B.total ? "A" : "B" };
+    const judge = (a, b) => {
+      const d = a - b, avg = (a + b) / 2, pct = avg > 0 ? Math.abs(d) / avg : 0, band = bandOf(pct);
+      return { winner: band === "Fair" ? "Even" : d > 0 ? "A" : "B", band, pct, delta: d };
+    };
+    const verdict = {}; TYPES.forEach((k) => (verdict[k] = judge(A.adj[k], B.adj[k])));
+    return { A, B, verdict, market: judge(A.cons, B.cons), valueWinner: A.total === B.total ? "Even" : A.total > B.total ? "A" : "B" };
   }
 
-  const api = { buildDB, analyze, analyzeTrade, fmtKey, W, PICK_ADJ, INJ, TYPES,
+  const api = { buildDB, analyze, analyzeTrade, fmtKey, consolidate, bandOf, trendHint, CONSOL_P, BANDS, W, PICK_ADJ, INJ, TYPES,
     LABEL: { Core: "Core asset (any team)", Contender: "Contender", Retooler: "Retooler", Rebuilder: "Rebuilder" } };
   if (typeof module !== "undefined") module.exports = api; else root.DPT = api;
 })(typeof window !== "undefined" ? window : globalThis);

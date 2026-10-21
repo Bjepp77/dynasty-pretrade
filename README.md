@@ -39,7 +39,12 @@ No build step, no API keys. Refresh the data snapshots (Node 18+): `node scripts
 - Tag: under a 50% chance of still being a regular in 2 seasons while the now score is 50+ = "Sell before cliff". Best score under 40 = "Contender depth only" or "Low value".
 
 ## Trade mode
-Each asset's aggregate market value (FantasyCalc scale) is scaled by `0.5 + overall/100` for each team type. The side with the higher total is "better for" that team type. Raw aggregate totals are shown too.
+Each asset's aggregate market value (FantasyCalc scale) is scaled by `0.5 + overall/100` for each team type. Each side is then **consolidated** with a power-sum `(sum v^1.3)^(1/1.3)`, so a 3-for-1 is not treated as the plain sum (roster spots and lineup slots make depth worth less than a star). p = 1.3 is fitted to FantasyCalc's own trade calculator rule (evidence in `docs/market-model.md`). The UI shows raw (plain sum) and adjusted totals.
+
+Verdict per team type uses gap / average of the two adjusted sides: under 8.5% Fair, 8.5-17% Slight edge, 17-42.5% Clear win, over 42.5% Lopsided.
+
+## 30-day trend
+`trend30` (% change in market value; mean of FantasyCalc and Dynasty Daddy where available) shows on the player card and trade rows as a triangle and percent. +10% or more adds "Rising: sell high if moving", -10% or less adds "Falling: buy the dip" (only for assets worth 1500+ on the FantasyCalc scale).
 
 ## Known estimates (hand-set, not fitted)
 - The market vs stats weights, the 0.65 persistence cutoff, the per-type horizon weights, the pick adjustments and the injury penalties above.

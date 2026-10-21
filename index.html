@@ -3,7 +3,7 @@
 <title>Dynasty Pre-Trade Analyzer</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>Dynasty Pre-Trade Analyzer</h1><p class="sub">Which kind of dynasty team is this player worth the most to?</p>
-<nav><button id="tabSingle" class="on">Player</button><button id="tabTrade">Trade</button>
+<nav><button id="tabSingle" class="on">Player</button><button id="tabTrade">Trade</button><button id="tabLeague">League</button>
 <select id="qbs" aria-label="QB format"><option value="1">1QB</option><option value="2">Superflex</option></select>
 <select id="ppr" aria-label="Scoring"><option value="1">PPR</option><option value="0.5">Half PPR</option><option value="0">Standard</option></select></nav>
 <div id="status" class="status">Loading live data...</div></header>
@@ -15,7 +15,11 @@
   <div class="side"><h3>Side B <small>(you get)</small></h3><div class="pick"><input id="qb" placeholder="Add player or pick to B" autocomplete="off"><div class="ac" id="acb"></div></div><ul id="lb"></ul></div>
  </div><div id="tout"></div>
 </section>
+<section id="league" hidden>
+ <div class="lrow"><input id="lid" placeholder="Sleeper league ID" inputmode="numeric" autocomplete="off"><button id="lload">Load league</button><select id="lme" aria-label="My team"></select></div>
+ <div id="lstatus" class="status">Enter a Sleeper league ID and press Load. Public read-only data, no login.</div><div id="lfmt" class="status"></div><div id="lout"></div>
+</section>
 </main>
 <footer>Market: aggregate of FantasyCalc, Dynasty Daddy, DynastyProcess and Sleeper dynasty ADP (snapshot, see docs/market-model.md). Stats: model fitted on nflverse data (docs/stats-model.md). Team, injury and depth: Sleeper (live). Not financial advice, it is fantasy football.</footer>
-<script src="scoring.js"></script><script src="app.js"></script>
+<script src="scoring.js"></script><script src="sim.js"></script><script src="league.js"></script><script src="app.js"></script>
 </body></html>

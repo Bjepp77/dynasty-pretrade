@@ -1,0 +1,32 @@
+name: Refresh market values
+
+# SHIPPED DISABLED. Only manual runs (Actions tab > Run workflow) are active.
+# To enable the daily schedule: uncomment the schedule block below, after owner OK.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 11 * * *"   # daily 11:00 UTC (about 06:00 US Central)
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch values
+        run: node scripts/fetch-values.mjs
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- data/values.json; then
+            echo "no change"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/values.json
+          git commit -m "Refresh market values $(date -u +%F)"
+          git push

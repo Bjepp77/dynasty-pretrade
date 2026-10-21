@@ -3,7 +3,7 @@
 // Usage: node scripts/fetch-values.mjs
 // Model and source decisions: docs/market-model.md
 // One fetch per source per run (FantasyCalc: one per format). No accounts, no keys, no retries.
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,6 +12,8 @@ const OUT = join(ROOT, "data", "values.json");
 const UA = "dynasty-pretrade/0.1 (personal hobby project; one fetch per source per run)";
 const SEASON = new Date().getFullYear();
 const GH_RAW = "https://raw.githubusercontent.com/dynastyprocess/data/master/files/";
+const MIN_PLAYERS = 300; // per format; a healthy run yields 500+
+const MIN_SOURCES = 3; // of 4 (fc and dd are also individually required)
 const SKILL = new Set(["QB", "RB", "WR", "TE"]);
 
 // ---------- config ----------
@@ -311,8 +313,18 @@ async function main() {
     model: { score: "100 * (value on FantasyCalc scale / top value) ^ 0.5", transform: "per-source rank-match to the same-format FantasyCalc value curve (FantasyCalc itself uses raw values)", baseWeights: BASE_WEIGHT, coverage: Object.fromEntries(Object.entries(coverage).map(([k, v]) => [k, +v.toFixed(3)])), trim: TRIM, spread: "population stdev of per-source scores" },
     sources, formats,
   };
+  // Unattended-run guard: never overwrite the last good snapshot with a degraded one.
+  const problems = [];
+  for (const k of ["fc", "dd"]) if (!srcData[k]) problems.push(`required source ${k} failed`);
+  if (srcData.fc && srcData.fc.note) problems.push(`fantasycalc partial: ${srcData.fc.note}`);
+  const okCount = Object.keys(srcData).length;
+  if (okCount < MIN_SOURCES) problems.push(`only ${okCount} of ${adapters.length} sources returned data (need ${MIN_SOURCES})`);
+  for (const [k, v] of Object.entries(formats)) { const n = Object.keys(v).length; if (n < MIN_PLAYERS) problems.push(`format ${k} has ${n} entries (need ${MIN_PLAYERS})`); }
+  if (problems.length) { console.error("REFUSING to write values.json (old file kept):\n - " + problems.join("\n - ")); process.exit(1); }
   await mkdir(dirname(OUT), { recursive: true });
-  await writeFile(OUT, JSON.stringify(doc) + "\n");
+  const tmp = OUT + ".tmp";
+  await writeFile(tmp, JSON.stringify(doc) + "\n");
+  await rename(tmp, OUT); // atomic replace
   log("wrote", OUT, Object.fromEntries(Object.entries(formats).map(([k, v]) => [k, Object.keys(v).length])));
 }
 main().catch((e) => { console.error(e); process.exit(1); });

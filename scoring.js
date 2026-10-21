@@ -19,13 +19,30 @@
     }
     return pts[pts.length - 1][1];
   }
+  // Fallback pick values (1QB/12-team/PPR, FantasyCalc 2026-10-21 snapshot), used only if the
+  // API response has no PICK rows. Early/mid/late scaled from the round value.
+  const PICK_FALLBACK = { "2027 1st": 4100, "2027 2nd": 1750, "2027 3rd": 900, "2027 4th": 450, "2028 1st": 3700, "2028 2nd": 1600, "2028 3rd": 850, "2028 4th": 420 };
+  function fallbackPicks() {
+    const out = [];
+    Object.entries(PICK_FALLBACK).forEach(([name, v]) => {
+      out.push({ id: "FB_" + name, name, value: v });
+      if (name.startsWith("2027")) [["Early", 1.15], ["Mid", 1], ["Late", 0.85]].forEach(([t, m]) => out.push({ id: `FB_${name}_${t}`, name: `${name} (${t})`, value: Math.round(v * m) }));
+    });
+    return out;
+  }
+  // Pick fit per team type: a pick adds nothing to this season's lineup, so it is worth most to a rebuilder.
+  const PICK_FIT = { Contender: 25, Retooler: 55, Rebuilder: 90 };
   const pctile = (arr, v) => (arr.length ? (100 * arr.filter((x) => x < v).length) / arr.length : 50);
 
-  // raw = {players, dyn, red, stats, statsYear, sos}
+  // raw = {players, dyn, red, stats, statsYear, sos, ppr}; ppr = 1, 0.5 or 0 picks the stat field for PPG
+  const PTS = { 1: "pts_ppr", 0.5: "pts_half_ppr", 0: "pts_std" };
   function buildDB(raw) {
     const redMap = {};
     (raw.red || []).forEach((r) => (redMap[r.player.sleeperId] = r.value));
-    const list = [];
+    const list = [], ptsKey = PTS[raw.ppr != null ? raw.ppr : 1] || "pts_ppr";
+    const apiPicks = (raw.dyn || []).filter((r) => r.player.position === "PICK").map((r) => ({ id: String(r.player.sleeperId), name: r.player.name, value: r.value }));
+    const picks = (apiPicks.length ? apiPicks : fallbackPicks()).map((k) => ({ id: k.id, name: k.name, pos: "PICK", team: "", dynValue: k.value, isPick: true }));
+    picks.sort((a, b) => a.name.localeCompare(b.name));
     (raw.dyn || []).forEach((r) => {
       const id = String(r.player.sleeperId);
       const sp = raw.players[id];
@@ -38,11 +55,11 @@
         injury: sp.injury_status || null, depth: sp.depth_chart_order,
         dynValue: r.value, redValue: redMap[id] != null ? redMap[id] : r.redraftValue,
         posRank: r.positionRank, overallRank: r.overallRank,
-        gp, ppg: gp >= 1 ? (st.pts_ppr || 0) / gp : 0,
+        gp, ppg: gp >= 1 ? (st[ptsKey] != null ? st[ptsKey] : st.pts_ppr || 0) / gp : 0,
       });
     });
     list.sort((a, b) => b.dynValue - a.dynValue);
-    const byId = {}; list.forEach((p) => (byId[p.id] = p));
+    const byId = {}; list.forEach((p) => (byId[p.id] = p)); picks.forEach((k) => (byId[k.id] = k));
     // production percentile per position (min 4 GP to count)
     const ppgByPos = {};
     POS.forEach((pos) => (ppgByPos[pos] = list.filter((p) => p.pos === pos && p.gp >= 4).map((p) => p.ppg)));
@@ -52,12 +69,13 @@
     const teamVals = Object.values(teamOff);
     list.forEach((p) => (p.offQuality = pctile(teamVals, teamOff[p.team] || 0)));
     const maxVal = list[0] ? list[0].dynValue : 10000;
-    return { list, byId, ppgByPos, maxVal, sos: raw.sos || {}, statsYear: raw.statsYear };
+    return { list, picks, pickSource: apiPicks.length ? "FantasyCalc" : "fallback table", byId, ppgByPos, maxVal, sos: raw.sos || {}, statsYear: raw.statsYear };
   }
 
   function analyze(db, id) {
     const p = db.byId[String(id)];
     if (!p) return null;
+    if (p.isPick) return { p, archetype: "Rebuilder", tag: "Draft pick", fit: PICK_FIT, winNow: PICK_FIT.Contender, longTerm: PICK_FIT.Rebuilder };
     const curve = AGE_CURVE[p.pos];
     const yearsToCliff = Math.max(0, +(curve.cliff - p.age).toFixed(1));
     const age = interp(curve.pts, p.age);
@@ -93,12 +111,15 @@
     else if (diff < -10) { archetype = "Rebuilder"; tag = "Rebuilder stash"; }
     if (archetype === "Retooler" && winNow >= 75 && longTerm >= 75) tag = "Buy for anyone (core hold)";
     if (yearsToCliff <= 1.5 && winNow >= 50 && archetype !== "Rebuilder") { tag = "Sell before cliff"; if (diff > 0) archetype = "Contender"; }
+    // Elite on both axes: worth the most to any team, so no single archetype fits.
+    if (winNow >= 85 && longTerm >= 85) { archetype = "Core"; if (tag !== "Sell before cliff") tag = "Buy for anyone (core hold)"; }
     const fit = { Contender: winNow, Retooler: (winNow + longTerm) / 2, Rebuilder: longTerm };
 
     const ppgRankTxt = p.gp >= 4 ? `top-${Math.max(1, Math.round((100 - production) / 100 * db.ppgByPos[p.pos].length) + 1)} ${p.pos} in PPG` : "limited games last year";
     const explanation = `${Math.floor(p.age)}-yo ${p.pos}, ${yearsToCliff} seasons from the cliff, ${ppgRankTxt}` +
       (archetype === "Contender" ? `: max value to a contender now${tag === "Sell before cliff" ? "; sell before the cliff hits" : ""}; rebuilders should sell.`
         : archetype === "Rebuilder" ? ": long runway and future premium, best value to a rebuilder; contenders gain little."
+        : archetype === "Core" ? ": elite now and for years; a core asset for any team, never a sell."
         : ": balanced profile, fits a fringe team or holds for anyone.");
     return { p, yearsToCliff, scores: { production, health, situation, sos, age, value, futurePremium }, detail: { depthScore, offQuality: p.offQuality, compScore, teammatesAhead: mates.length, premiumPct },
       winNow, longTerm, diff, archetype, tag, fit, explanation };
@@ -121,6 +142,6 @@
     return { A, B, verdict, valueWinner: A.total === B.total ? "Even" : A.total > B.total ? "A" : "B" };
   }
 
-  const api = { buildDB, analyze, analyzeTrade, AGE_CURVE };
+  const api = { buildDB, analyze, analyzeTrade, AGE_CURVE, PICK_FIT, fallbackPicks, LABEL: { Core: "Core asset (any team)", Contender: "Contender", Retooler: "Retooler", Rebuilder: "Rebuilder" } };
   if (typeof module !== "undefined") module.exports = api; else root.DPT = api;
 })(typeof window !== "undefined" ? window : globalThis);

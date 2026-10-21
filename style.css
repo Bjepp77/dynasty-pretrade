@@ -9,7 +9,7 @@ nav button{background:var(--card);color:var(--ink);border:1px solid var(--line);
 .ac div{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between}.ac div:hover{background:var(--line)}.ac span{color:var(--mute);font-size:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}.top h2{margin:0}.meta{color:var(--mute);font-size:13px}
-.badge{padding:6px 12px;border-radius:20px;font-weight:700;color:#fff}.Contender{background:var(--clay)}.Rebuilder{background:var(--sage)}.Retooler{background:#8b8574}
+.badge{padding:6px 12px;border-radius:20px;font-weight:700;color:#fff}.Contender{background:var(--clay)}.Rebuilder{background:var(--sage)}.Retooler{background:#8b8574}.Core{background:#6d7f9a}
 .tag{display:inline-block;margin-top:6px;padding:3px 10px;border:1px solid var(--clay);border-radius:6px;color:var(--clay);font-weight:600}
 .exp{margin:12px 0;font-size:16px}.bar{display:grid;grid-template-columns:110px 1fr 36px;gap:8px;align-items:center;margin:5px 0;font-size:13px}
 .track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}.fill{height:100%;background:var(--sage)}.fill.w{background:var(--clay)}
@@ -17,3 +17,4 @@ nav button{background:var(--card);color:var(--ink);border:1px solid var(--line);
 .sides{display:grid;grid-template-columns:1fr 1fr;gap:14px}ul{list-style:none;padding:0}li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;display:flex;justify-content:space-between}li button{background:none;border:0;color:var(--bad);cursor:pointer;font-size:16px}
 .verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.verdict div{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}.verdict b{display:block;font-size:20px;color:var(--clay)}
 small{color:var(--mute);font-weight:400}footer{color:var(--mute);font-size:12px}
+nav select{background:var(--card);color:var(--ink);border:1px solid var(--line);padding:8px;border-radius:8px;margin-right:6px}

@@ -38,9 +38,30 @@ Common ids: `2027_1_early`, `2027_1_mid`, `2027_1_late`, generic `2027_1`. Seaso
 
 ```
 {generated, model, sources:[{name,ok,count,tos,rows,matched,matchRate,...}],
- formats:{"1qb_ppr":{<sleeper id | pick id>:{name,pos,marketScore,aggValue,n,spread,by}}, ...}}
+ formats:{"1qb_ppr":{<sleeper id | pick id>:{name,pos,marketScore,aggValue,n,spread,by,trend30}}, ...}}
 ```
 JSON objects reorder integer-like keys, so sort by `marketScore` yourself.
+
+## 30-day trend
+
+`trend30` = % change of market value over 30 days, or `null`. FantasyCalc: `trend30Day` is an absolute change on the value scale, so `% = trend30Day / (value - trend30Day) * 100`. Dynasty Daddy: `(trade_value - last_month_value) / last_month_value * 100` (`sf_trade_value` and `last_month_value_sf` for Superflex). `trend30` is the mean of the sources that have one, capped to -100..+300. DynastyProcess and Sleeper ADP have no trend. Coverage on 2026-10-21: 447 of 578 assets in 1QB PPR (442-453 in the other formats), 36 of 53 picks. Percent moves on cheap players are noise, so the app shows the Rising/Falling hint (+/-10%) only for assets with aggValue 1500 or more.
+
+## Trade consolidation discount (used by the app, not by this script)
+
+A side's value is the power-sum `(sum v_i^p)^(1/p)` with p = 1.3. One asset is unchanged; three equal assets are worth 3^(1/1.3) = 2.3 times one, not 3.
+
+Evidence: FantasyCalc's calculator (client code `chunk-F4CNOEUX.js`, `getValueAdjustment`, dynasty branch; robots.txt allows the page) gives the side with fewer assets a bonus. For the k = (bigger side count - smaller side count) lowest-valued assets of the bigger side, sorted ascending, bonus_i = floor(min(0.6982 * v_i, 753 + 0.23 * i)). Equal counts get none. So a 1-for-3 is fair in FantasyCalc when `star + bonus(two lowest pieces) = sum of the three`. A power-sum was fitted to this on 4000 random 2-, 3- and 4-asset packages drawn from FantasyCalc's top 200 (value above 800), minimizing squared relative error of the package's single-asset equivalent `sum - bonus`:
+
+| Format | best p | rmse | ranked decay d (next asset x d^i) | rmse |
+|---|---|---|---|---|
+| 1QB PPR | 1.31 | 9.0% | 0.69 | 9.2% |
+| Superflex PPR | 1.24 | 7.8% | 0.75 | 8.2% |
+
+By package size the best p is 1.46 (2 assets), 1.32 (3), 1.27 (4) for 1QB; 1.35, 1.25, 1.21 for Superflex. Power-sum fits slightly better than ranked decay, so it is used with one pooled p = 1.3. Examples (1QB data): 6067 + 3478 + 2907 (plain sum 12452) is worth 10946 in FantasyCalc and 9756 here; 4446 + 3803 (8249) is 7496 vs 7006. The model discounts more than FantasyCalc on large packages, because FantasyCalc's bonus is capped near 753 per extra piece and a smooth curve cannot reproduce a cap. FantasyCalc also discounts only the count gap (2-for-2 gets none); here each side is discounted by its own makeup. The 7-9% rmse is the honest uncertainty on p.
+
+## Fairness bands
+
+gap = |A - B|, average = (A + B) / 2, pct = gap / average, on the adjusted (team-type-weighted, package-discounted) side values: under 8.5% Fair, 8.5-17% Slight edge, 17-42.5% Clear win, over 42.5% Lopsided. The cutoffs were set by the project owner, not fitted. They apply to each team type separately.
 
 ## Known limits
 

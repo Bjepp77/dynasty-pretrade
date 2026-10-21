@@ -184,7 +184,7 @@ function leagueTradeOdds(t) {
     const L = LG, tr = League.tradeOverride(L, my, a, b), ign = a.filter((id) => !tr.gives.includes(id) && !DB.byId[id].isPick).length;
     const after = Sim.run(League.toSimInput(L, tr.override), { n: 10000, seed: 7 });
     const i = LGSIM.teams.findIndex((x) => x.id === my), c = LGSIM.teams.findIndex((x) => x.id === tr.counterparty), b0 = LGSIM.teams[i], a0 = after.teams[i];
-    const v = League.titleVerdict(b0.title, a0.title, L.numTeams, t.A.total > t.B.total);
+    const v = League.titleVerdict(b0.title, a0.title, L.numTeams, t.A.cons > t.B.cons); // package-discounted market: does my side give more?
     const nm = L.teams.find((x) => x.rid === my).owner;
     box.innerHTML = `<div class="card"><h3>Title odds for ${esc(nm)}</h3>
      <div class="verdict"><div><small>Title before</small><b>${P1(b0.title)}</b></div><div><small>Title after</small><b>${P1(a0.title)}</b></div><div><small>Playoffs</small><b>${P1(b0.playoff)} to ${P1(a0.playoff)}</b></div></div>

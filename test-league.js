@@ -1,6 +1,7 @@
 // node test-league.js [leagueId] : live Sleeper league import, power table, title odds, chips, sample trade.
 // LEAGUE=<id> ME=<display_name> N=<sims> node test-league.js
 const League = require("./league.js"), Sim = require("./sim.js");
+const values = require("./data/values.json");
 const ok = (c, m) => { if (!c) { console.error("FAIL", m); process.exitCode = 1; } else console.log("ok  ", m); };
 const pct = (x) => (100 * x).toFixed(1).padStart(5) + "%";
 (async () => {
@@ -53,7 +54,10 @@ const pct = (x) => (100 * x).toFixed(1).padStart(5) + "%";
   console.log(`\nSAMPLE TRADE: give ${give.name} (${give.ppg.toFixed(1)}) get ${tgt.name} (${tgt.ppg.toFixed(1)}) from ${topTeam.owner}`);
   console.log(`  me: title ${pct(base.teams[iB].title)} -> ${pct(after.teams[iB].title)}, playoff ${pct(base.teams[iB].playoff)} -> ${pct(after.teams[iB].playoff)}`);
   console.log(`  them: title ${pct(base.teams[cpI].title)} -> ${pct(after.teams[cpI].title)}`);
-  console.log(" ", League.titleVerdict(base.teams[iB].title, after.teams[iB].title, L.numTeams, true).text);
+  const mv = (id) => { const e = values.formats.sf_ppr[id]; return e ? e.aggValue : 0; };
+  const costs = mv(give.id) > mv(tgt.id);
+  console.log(`  market: give ${mv(give.id)} get ${mv(tgt.id)} (${costs ? "costs value" : "gains value"})`);
+  console.log(" ", League.titleVerdict(base.teams[iB].title, after.teams[iB].title, L.numTeams, costs).text);
   const noop = Sim.run(League.toSimInput(L, League.tradeOverride(L, me.rid, [], []).override), { n: N, seed: 7 });
   ok(Math.abs(noop.teams[iB].title - base.teams[iB].title) < 1e-9, "no-op trade reproduces baseline exactly (common random numbers)");
   const v = (b, a, c) => League.titleVerdict(b, a, 12, c).zone;

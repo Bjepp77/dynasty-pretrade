@@ -28,7 +28,7 @@ nav select{background:var(--card);color:var(--ink);border:1px solid var(--line);
 .tot{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0;font-variant-numeric:tabular-nums}.tot th,.tot td{padding:4px 8px;text-align:right;border-bottom:1px solid var(--line)}.tot th:first-child,.tot td:first-child{text-align:left}.tot th{color:var(--mute);font-weight:400;vertical-align:bottom}
 details.how{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}details.how summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--clay);font-weight:600;font-size:14px}
 .lrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.lrow input{flex:1 1 220px;width:auto}.lrow button,.lrow select,.card>button{background:var(--card);color:var(--ink);border:1px solid var(--line);min-height:44px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:14px}.lrow button,.card>button{background:var(--f-sage);color:#fff;border-color:var(--f-sage)}.lrow button:hover:not(:disabled),.card>button:hover{filter:brightness(1.12)}
-button:disabled{opacity:.5;cursor:not-allowed}
+.lrow button:disabled,button:disabled{background:var(--line);border-color:var(--line);color:var(--mute);cursor:not-allowed}
 .lt{display:block;overflow-x:auto}.lt th{white-space:nowrap}.lt tr.me td{background:var(--line);font-weight:600}.lt td:nth-child(2),.lt th:nth-child(2){text-align:left}
 .sk h4{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:0}.sk h4 .tag{margin-top:0}
 .tag.lowconf{margin:0 0 0 6px;padding:1px 8px;font-size:11px;border-color:var(--bad);color:var(--bad);vertical-align:middle}small.lowconf{color:var(--bad)}.sk h4 .tag.lowconf{margin:0}

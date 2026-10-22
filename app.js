@@ -31,21 +31,41 @@ async function load() {
   $("#status").textContent = `${DB.list.length} players + ${DB.picks.length} picks (${fmt}, 12 teams). Market values from ${used}, snapshot ${DB.generated.slice(0, 10)}. Stats model: ${DB.statsMeta.featureSeason} season, PPR.`;
 }
 
+// Combobox: arrows move the highlight, Enter picks it (or the first match), Escape closes
 function ac(input, box, onPick, withPicks) {
+  let act = -1, blurT = 0;
+  input.setAttribute("role", "combobox"); input.setAttribute("aria-autocomplete", "list"); input.setAttribute("aria-expanded", "false"); input.setAttribute("aria-controls", box.id);
+  box.setAttribute("role", "listbox");
+  box.onmousedown = (e) => e.preventDefault(); // keep focus in the input (options and scrollbar)
+  const close = () => { box.innerHTML = ""; act = -1; input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); };
+  const mark = (i) => {
+    const opts = box.children; if (!opts.length) return;
+    act = (i + opts.length) % opts.length;
+    [...opts].forEach((o, k) => { o.classList.toggle("active", k === act); o.setAttribute("aria-selected", k === act ? "true" : "false"); });
+    input.setAttribute("aria-activedescendant", opts[act].id); opts[act].scrollIntoView({ block: "nearest" });
+  };
   input.addEventListener("input", () => {
-    const t = input.value.trim().toLowerCase(); box.innerHTML = "";
+    clearTimeout(blurT); const t = input.value.trim().toLowerCase(); close();
     if (!DB || t.length < 2) return;
-    (withPicks ? DB.list.concat(DB.picks) : DB.list).filter((p) => p.name.toLowerCase().includes(t)).slice(0, 8).forEach((p) => {
+    (withPicks ? DB.list.concat(DB.picks) : DB.list).filter((p) => p.name.toLowerCase().includes(t)).slice(0, 8).forEach((p, i) => {
       const d = document.createElement("div");
+      d.id = box.id + "-o" + i; d.setAttribute("role", "option"); d.setAttribute("aria-selected", "false");
       d.innerHTML = p.isPick ? `${p.name} <span>draft pick · market ${Math.round(p.market)}</span>` : `${p.name} <span>${p.pos} ${p.team}${p.age ? " · " + Math.floor(p.age) + "y" : ""} · market ${Math.round(p.market)}</span>`;
-      d.onclick = () => { box.innerHTML = ""; input.value = ""; onPick(p.id); };
+      d.onclick = () => { close(); input.value = ""; onPick(p.id); };
       box.appendChild(d);
     });
+    if (box.children.length) input.setAttribute("aria-expanded", "true");
   });
-  // Enter picks the first suggestion
-  input.addEventListener("keydown", (e) => { if (e.key !== "Enter") return; e.preventDefault();
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (!box.children.length) input.dispatchEvent(new Event("input")); mark(e.key === "ArrowDown" ? act + 1 : act < 0 ? -1 : act - 1); return; }
+    if (e.key === "Escape") { close(); return; }
+    if (e.key !== "Enter") return; e.preventDefault();
+    if (act >= 0 && box.children[act]) { box.children[act].click(); return; }
     input.dispatchEvent(new Event("input")); // rebuild from the current text so a fast Enter never hits stale suggestions
-    if (box.firstChild) box.firstChild.click(); });
+    if (box.firstChild) box.firstChild.click();
+  });
+  input.addEventListener("blur", () => (blurT = setTimeout(close, 100)));
+  input.addEventListener("focus", () => clearTimeout(blurT));
 }
 const bar = (label, v, w) => `<div class="bar"><span>${label}</span><div class="track"><div class="fill ${w ? "w" : ""}" style="width:${Math.round(v)}%"></div></div><b>${Math.round(v)}</b></div>`;
 
@@ -87,32 +107,41 @@ function showSingle(id) { $("#out").innerHTML = card(DPT.analyze(DB, id)); }
 
 function renderSide(ids, ul, arr) {
   ul.innerHTML = ""; arr.forEach((id, i) => { const p = DB.byId[id]; const li = document.createElement("li");
-    li.innerHTML = `<span>${p.name} <small>${p.isPick ? "pick" : p.pos + " " + p.team} · value ${Math.round(p.value)}</small> ${trendTxt(p.trend)}</span>`; const b = document.createElement("button"); b.textContent = "×"; b.onclick = () => { arr.splice(i, 1); renderTrade(); }; li.appendChild(b); ul.appendChild(li); });
+    li.innerHTML = `<span>${p.name} <small>${p.isPick ? "pick" : p.pos + " " + p.team} · value ${Math.round(p.value)}</small> ${trendTxt(p.trend)}</span>`; const b = document.createElement("button"); b.textContent = "×"; b.className = "rm"; b.setAttribute("aria-label", "Remove " + p.name); b.onclick = () => { arr.splice(i, 1); renderTrade(); }; li.appendChild(b); ul.appendChild(li); });
 }
 function renderTrade() {
   renderSide(0, $("#la"), sideA); renderSide(0, $("#lb"), sideB);
   if (!sideA.length || !sideB.length) { $("#tout").innerHTML = "<p class='meta'>Add at least one player to each side.</p>"; return; }
   const t = DPT.analyzeTrade(DB, sideA, sideB);
   const w = (v) => (v.winner === "Even" ? "Fair" : `Side ${v.winner}: ${v.band}`);
-  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} ${trendTxt(r.trend)} ${r.trendHint ? `<small>${r.trendHint}</small>` : ""}${r.lowConf ? ' <small class="lowconf">low-confidence stats</small>' : ""}<br><small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge ${r.archetype}" style="font-size:11px">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
+  const row = (S, n) => S.rs.map((r) => `<li><span>${r.p.name} ${trendTxt(r.trend)} ${r.trendHint ? `<small>${r.trendHint}</small>` : ""}${r.lowConf ? ' <small class="lowconf">low-confidence stats</small>' : ""}<br><small>C ${Math.round(r.overall.Contender)} · Rt ${Math.round(r.overall.Retooler)} · Rb ${Math.round(r.overall.Rebuilder)}</small></span><span><span class="badge sm ${r.archetype}">${DPT.LABEL[r.archetype]}</span></span></li>`).join("");
   const n0 = (x) => Math.round(x).toLocaleString();
   const trow = (label, a, b) => `<tr><td>${label}</td><td>${n0(a)}</td><td>${n0(b)}</td></tr>`;
   const vk = (k) => `<div><small>Better for a ${k}</small><b>${w(t.verdict[k])}</b><small>${(100 * t.verdict[k].pct).toFixed(1)}% gap</small></div>`;
+  const howOpen = !!$("#tout details.how[open]");
   $("#tout").innerHTML = `<div class="card"><h3>Verdict</h3><div class="verdict">${DPT.TYPES.map(vk).join("")}</div>
+   <p class="exp">Market: ${t.market.winner === "Even" ? "fair" : "Side " + t.market.winner + " ahead, " + t.market.band.toLowerCase()} (${(100 * t.market.pct).toFixed(1)}% gap on adjusted totals).</p>
+   <div class="pair"><ul>${row(t.A)}</ul><ul>${row(t.B)}</ul></div>
+   <details class="how"${howOpen ? " open" : ""}><summary>Totals and how the verdict is computed</summary>
    <table class="tot"><tr><th></th><th>Side A</th><th>Side B</th></tr>
     ${trow("Raw market total (plain sum)", t.A.total, t.B.total)}${trow("Adjusted market total (package discount)", t.A.cons, t.B.cons)}
     ${DPT.TYPES.map((k) => trow(k + " raw (score-weighted)", t.A.rawAdj[k], t.B.rawAdj[k]) + trow(k + " adjusted", t.A.adj[k], t.B.adj[k])).join("")}</table>
-   <p class="exp">Market: ${t.market.winner === "Even" ? "fair" : "Side " + t.market.winner + " ahead, " + t.market.band.toLowerCase()} (${(100 * t.market.pct).toFixed(1)}% gap on adjusted totals). The package discount values a side as (sum of v^${DPT.CONSOL_P})^(1/${DPT.CONSOL_P}), so several small pieces are worth less than one star of the same plain sum. Gap = difference / average of the two adjusted sides: under 8.5% Fair, 8.5-17% Slight edge, 17-42.5% Clear win, over 42.5% Lopsided. Per team type, each asset is first weighted by its overall score for that type.</p>
-   <div class="pair"><ul>${row(t.A)}</ul><ul>${row(t.B)}</ul></div></div><div id="lgOdds"></div>`;
+   <p class="meta">The package discount values a side as (sum of v^${DPT.CONSOL_P})^(1/${DPT.CONSOL_P}), so several small pieces are worth less than one star of the same plain sum. Gap = difference / average of the two adjusted sides: under 8.5% Fair, 8.5-17% Slight edge, 17-42.5% Clear win, over 42.5% Lopsided. Per team type, each asset is first weighted by its overall score for that type.</p></details></div><div id="lgOdds"></div>`;
   leagueTradeOdds(t);
 }
 
 const TABS = { Single: "single", Trade: "trade", League: "league" };
 function showTab(name) {
-  Object.entries(TABS).forEach(([k, id]) => { $("#" + id).hidden = k !== name; $("#tab" + k).className = k === name ? "on" : ""; });
+  Object.entries(TABS).forEach(([k, id]) => { $("#" + id).hidden = k !== name; $("#tab" + k).className = k === name ? "on" : ""; $("#tab" + k).setAttribute("aria-selected", k === name ? "true" : "false"); $("#tab" + k).tabIndex = k === name ? 0 : -1; });
   if (name === "Trade") renderTrade();
 }
 Object.keys(TABS).forEach((k) => ($("#tab" + k).onclick = () => showTab(k)));
+// ARIA tabs: one Tab stop, arrows move between tabs
+$(".tabs").addEventListener("keydown", (e) => {
+  const ks = Object.keys(TABS), i = ks.findIndex((k) => $("#tab" + k) === document.activeElement); if (i < 0) return;
+  const n = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: ks.length - 1 }[e.key]; if (n == null) return;
+  e.preventDefault(); const k = ks[(n + ks.length) % ks.length]; showTab(k); $("#tab" + k).focus();
+});
 ac($("#q"), $("#ac"), showSingle);
 ac($("#qa"), $("#aca"), (id) => { sideA.push(id); renderTrade(); }, true);
 ac($("#qb"), $("#acb"), (id) => { sideB.push(id); renderTrade(); }, true);

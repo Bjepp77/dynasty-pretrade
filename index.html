@@ -3,22 +3,22 @@
 <title>Dynasty Pre-Trade Analyzer</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><h1>Dynasty Pre-Trade Analyzer</h1><p class="sub">Which kind of dynasty team is this player worth the most to?</p>
-<nav><button id="tabSingle" class="on">Player</button><button id="tabTrade">Trade</button><button id="tabLeague">League</button>
-<select id="qbs" aria-label="QB format"><option value="1">1QB</option><option value="2">Superflex</option></select>
-<select id="ppr" aria-label="Scoring"><option value="1">PPR</option><option value="0.5">Half PPR</option><option value="0">Standard</option></select></nav>
-<div id="status" class="status">Loading live data...</div></header>
+<nav><div class="tabs" role="tablist" aria-label="View"><button id="tabSingle" class="on" role="tab" aria-selected="true" aria-controls="single">Player</button><button id="tabTrade" role="tab" tabindex="-1" aria-selected="false" aria-controls="trade">Trade</button><button id="tabLeague" role="tab" tabindex="-1" aria-selected="false" aria-controls="league">League</button></div>
+<div class="fmt"><select id="qbs" aria-label="QB format"><option value="1">1QB</option><option value="2">Superflex</option></select>
+<select id="ppr" aria-label="Scoring"><option value="1">PPR</option><option value="0.5">Half PPR</option><option value="0">Standard</option></select></div></nav>
+<div id="status" class="status" role="status" aria-live="polite">Loading live data...</div></header>
 <main>
-<section id="single"><div class="pick"><input id="q" placeholder="Search a player (e.g. Ja'Marr Chase)" autocomplete="off"><div class="ac" id="ac"></div></div><div id="out"></div></section>
-<section id="trade" hidden>
+<section id="single" role="tabpanel" aria-labelledby="tabSingle"><div class="pick"><input id="q" aria-label="Search a player" placeholder="Search a player (e.g. Ja'Marr Chase)" autocomplete="off"><div class="ac" id="ac"></div></div><div id="out"></div></section>
+<section id="trade" role="tabpanel" aria-labelledby="tabTrade" hidden>
  <div class="sides">
-  <div class="side"><h3>Side A <small>(you give)</small></h3><div class="pick"><input id="qa" placeholder="Add player or pick to A" autocomplete="off"><div class="ac" id="aca"></div></div><ul id="la"></ul></div>
-  <div class="side"><h3>Side B <small>(you get)</small></h3><div class="pick"><input id="qb" placeholder="Add player or pick to B" autocomplete="off"><div class="ac" id="acb"></div></div><ul id="lb"></ul></div>
+  <div class="side"><h3>Side A <small>(you give)</small></h3><div class="pick"><input id="qa" aria-label="Add player or pick to side A" placeholder="Add player or pick to A" autocomplete="off"><div class="ac" id="aca"></div></div><ul id="la"></ul></div>
+  <div class="side"><h3>Side B <small>(you get)</small></h3><div class="pick"><input id="qb" aria-label="Add player or pick to side B" placeholder="Add player or pick to B" autocomplete="off"><div class="ac" id="acb"></div></div><ul id="lb"></ul></div>
  </div><div id="tout"></div>
 </section>
-<section id="league" hidden>
- <div class="lrow"><input id="lid" placeholder="Sleeper league ID" inputmode="numeric" autocomplete="off"><button id="lload">Load league</button><select id="lme" aria-label="My team"></select></div>
- <div class="status">Find the ID in your Sleeper league URL: sleeper.com/leagues/<b>&lt;league ID&gt;</b>/...</div>
- <div id="lstatus" class="status">Enter a Sleeper league ID and press Load. Public read-only data, no login.</div><div id="lfmt" class="status"></div><div id="sug"></div><div id="lout"></div>
+<section id="league" role="tabpanel" aria-labelledby="tabLeague" hidden>
+ <div class="lrow"><input id="lid" aria-label="Sleeper league ID" aria-describedby="lhint" placeholder="Sleeper league ID" inputmode="numeric" autocomplete="off"><button id="lload">Load league</button><select id="lme" aria-label="My team"></select></div>
+ <div id="lhint" class="status">Find the ID in your Sleeper league URL: sleeper.com/leagues/<b>&lt;league ID&gt;</b>/...</div>
+ <div id="lstatus" class="status" role="status" aria-live="polite">Enter a Sleeper league ID and press Load. Public read-only data, no login.</div><div id="lfmt" class="status"></div><div id="sug"></div><div id="lout"></div>
 </section>
 </main>
 <footer>Market: aggregate of FantasyCalc, Dynasty Daddy, DynastyProcess and Sleeper dynasty ADP (snapshot, see docs/market-model.md). Stats: model fitted on nflverse data (docs/stats-model.md). Team, injury and depth: Sleeper (live). Not financial advice, it is fantasy football.</footer>
